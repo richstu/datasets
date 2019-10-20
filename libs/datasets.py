@@ -946,21 +946,21 @@ def get_path_to_keys_dataset_files_info(dataset_files_info):
       path_to_keys_dataset_files_info[path] = [dataset, path]
   return path_to_keys_dataset_files_info
 
-# reject_function should have input as (reject_input, mc_datasets, mc_dataset_name, year, data_tier, path)
-def reject_bad_pu_2017_mc_datasets(dummy_input, mc_datasets, mc_dataset_name, year, data_tier, path):
-  path_info = mc_datasets[mc_dataset_name][year][data_tier][path]
-  if year == '2017':
-    if data_tier == 'miniaod':
-      if len(path_info['parent_chain']) < 1: return True
-      parent = path_info['parent_chain'][0]
-      if not 'PU2017' in parent: return True
-      return False
-    elif data_tier == 'nanoaod':
-      if len(path_info['parent_chain']) < 2: return True
-      parent_parent = path_info['parent_chain'][1]
-      if not 'PU2017' in parent_parent: return True
-      return False
-  return False
+## reject_function should have input as (reject_input, mc_datasets, mc_dataset_name, year, data_tier, path)
+#def reject_bad_pu_2017_mc_datasets(dummy_input, mc_datasets, mc_dataset_name, year, data_tier, path):
+#  path_info = mc_datasets[mc_dataset_name][year][data_tier][path]
+#  if year == '2017':
+#    if data_tier == 'miniaod':
+#      if len(path_info['parent_chain']) < 1: return True
+#      parent = path_info['parent_chain'][0]
+#      if not 'PU2017' in parent: return True
+#      return False
+#    elif data_tier == 'nanoaod':
+#      if len(path_info['parent_chain']) < 2: return True
+#      parent_parent = path_info['parent_chain'][1]
+#      if not 'PU2017' in parent_parent: return True
+#      return False
+#  return False
 
 
 if __name__ == '__main__':

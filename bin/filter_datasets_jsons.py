@@ -106,21 +106,21 @@ def reject_string_ignore_case_path_parent_data_datasets(string, data_datasets, s
   if string.lower() in path.lower(): reject = True
   return reject
 
-## reject_function should have input as (reject_input, mc_datasets, mc_dataset_name, year, data_tier, path)
-#def reject_bad_pu_2017_mc_datasets(dummy_input, mc_datasets, mc_dataset_name, year, data_tier, path):
-#  path_info = mc_datasets[mc_dataset_name][year][data_tier][path]
-#  if year == '2017':
-#    if data_tier == 'miniaod':
-#      if len(path_info['parent_chain']) < 1: return True
-#      parent = path_info['parent_chain'][0]
-#      if not 'PU2017' in parent: return True
-#      return False
-#    elif data_tier == 'nanoaod':
-#      if len(path_info['parent_chain']) < 2: return True
-#      parent_parent = path_info['parent_chain'][1]
-#      if not 'PU2017' in parent_parent: return True
-#      return False
-#  return False
+# reject_function should have input as (reject_input, mc_datasets, mc_dataset_name, year, data_tier, path)
+def reject_bad_pu_2017_mc_datasets(dummy_input, mc_datasets, mc_dataset_name, year, data_tier, path):
+  path_info = mc_datasets[mc_dataset_name][year][data_tier][path]
+  if year == '2017':
+    if data_tier == 'miniaod':
+      if len(path_info['parent_chain']) < 1: return True
+      parent = path_info['parent_chain'][0]
+      if not 'PU2017' in parent: return True
+      return False
+    elif data_tier == 'nanoaod':
+      if len(path_info['parent_chain']) < 2: return True
+      parent_parent = path_info['parent_chain'][1]
+      if not 'PU2017' in parent_parent: return True
+      return False
+  return False
 
 # reject_function should have input as (reject_input, mc_datasets, mc_dataset_name, year, data_tier, path)
 def get_rejected_mc_datasets(mc_datasets, reject_mc_function, reject_input):
@@ -342,13 +342,13 @@ if __name__ == '__main__':
     print('Using ps_weights for below, because no other datasets')
     datasets.print_path_mc_datasets(bad_ps_weights_mc_datasets)
 
-    pu_filtered_mc_datasets = filter_if_possible_mc_datasets(filtered_mc_datasets, datasets.reject_bad_pu_2017_mc_datasets)
+    pu_filtered_mc_datasets = filter_if_possible_mc_datasets(filtered_mc_datasets, reject_bad_pu_2017_mc_datasets)
     #datasets.print_path_mc_datasets(pu_filtered_mc_datasets)
     #datasets.print_multiple_mc_datasets(pu_filtered_mc_datasets)
     #datasets.print_incomplete_parent_mc_datasets(pu_filtered_mc_datasets)
     datasets.print_missing_mc_datasets(keys_mc_datasets, pu_filtered_mc_datasets)
 
-    bad_pu_mc_datasets = get_unrejected_if_possible_mc_datasets(filtered_mc_datasets, datasets.reject_bad_pu_2017_mc_datasets)
+    bad_pu_mc_datasets = get_unrejected_if_possible_mc_datasets(filtered_mc_datasets, reject_bad_pu_2017_mc_datasets)
     #datasets.print_path_parent_mc_datasets(bad_pu_mc_datasets)
     print('Using bad pileup for below, because no other datasets')
     datasets.print_path_mc_datasets(bad_pu_mc_datasets)

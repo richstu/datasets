@@ -143,7 +143,7 @@ def get_info_path_string_mc_datasets(path, mc_datasets, prefix):
   keys = path_to_keys_mc_datasets[path]
   keys.append(path)
   path_info = nested_dict.get_item_nested_dict(mc_datasets, keys)
-  bad_pu = datasets.reject_bad_pu_2017_mc_datasets('', mc_datasets, keys[0], keys[1], keys[2], keys[3])
+  bad_pu = filter_datasets_jsons.reject_bad_pu_2017_mc_datasets('', mc_datasets, keys[0], keys[1], keys[2], keys[3])
 
   # Print extra info
   if bad_pu:
@@ -345,7 +345,7 @@ def get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, mc_d
   keys = path_to_keys_mc_datasets[path]
   keys.append(path)
   path_info = nested_dict.get_item_nested_dict(mc_datasets, keys)
-  bad_pu = datasets.reject_bad_pu_2017_mc_datasets('', mc_datasets, keys[0], keys[1], keys[2], keys[3])
+  bad_pu = filter_datasets_jsons.reject_bad_pu_2017_mc_datasets('', mc_datasets, keys[0], keys[1], keys[2], keys[3])
   
   # Print extra info
   if bad_pu:
