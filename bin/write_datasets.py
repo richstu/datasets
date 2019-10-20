@@ -57,13 +57,13 @@ def are_arguments_valid(args):
     if not os.path.isfile(t_path):
       return False, t_path+' does not exists.'
 
-    t_path = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_pu_mc_datasets.json')
-    if not os.path.isfile(t_path):
-      return False, t_path+' does not exists.'
+    #t_path = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_pu_mc_datasets.json')
+    #if not os.path.isfile(t_path):
+    #  return False, t_path+' does not exists.'
 
-    t_path = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_ps_weight_mc_datasets.json')
-    if not os.path.isfile(t_path):
-      return False, t_path+' does not exists.'
+    #t_path = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_ps_weight_mc_datasets.json')
+    #if not os.path.isfile(t_path):
+    #  return False, t_path+' does not exists.'
 
   if 'data' in args['mc_data']:
     t_path = os.path.join(args['in_json_folder'], args['in_json_prefix']+'data_datasets.json')
@@ -112,30 +112,29 @@ def are_arguments_valid(args):
 
   return True, ''
 
-
-# multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
-def select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection):
-  mc_datasets_selected = {}
-  mc_datasets_non_selected = {}
-  for mc_dataset_name in mc_datasets:
-    for year in mc_datasets[mc_dataset_name]:
-      for data_tier in mc_datasets[mc_dataset_name][year]:
-        search_string = datasets.get_mc_dataset_search_string(mc_tag_meta, mc_dataset_name, year, data_tier)
-        multiple_selected_paths = None
-        if search_string in multiple_selection:
-          multiple_selected_paths = multiple_selection[search_string]['selected_paths']
-        if len(mc_datasets[mc_dataset_name][year][data_tier]) == 1: 
-          path = next(iter(mc_datasets[mc_dataset_name][year][data_tier]))
-          nested_dict.fill_nested_dict(mc_datasets_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
-        else:
-          for path in mc_datasets[mc_dataset_name][year][data_tier]:
-            if multiple_selected_paths != None:
-              if path in multiple_selected_paths:
-                nested_dict.fill_nested_dict(mc_datasets_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
-            else:
-              print('[Warning] '+path+' is not in multiple_selection. Will not select any dataset.')
-              nested_dict.fill_nested_dict(mc_datasets_non_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
-  return mc_datasets_selected, mc_datasets_non_selected
+## multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
+#def select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection):
+#  mc_datasets_selected = {}
+#  mc_datasets_non_selected = {}
+#  for mc_dataset_name in mc_datasets:
+#    for year in mc_datasets[mc_dataset_name]:
+#      for data_tier in mc_datasets[mc_dataset_name][year]:
+#        search_string = datasets.get_mc_dataset_search_string(mc_tag_meta, mc_dataset_name, year, data_tier)
+#        multiple_selected_paths = None
+#        if search_string in multiple_selection:
+#          multiple_selected_paths = multiple_selection[search_string]['selected_paths']
+#        if len(mc_datasets[mc_dataset_name][year][data_tier]) == 1: 
+#          path = next(iter(mc_datasets[mc_dataset_name][year][data_tier]))
+#          nested_dict.fill_nested_dict(mc_datasets_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
+#        else:
+#          for path in mc_datasets[mc_dataset_name][year][data_tier]:
+#            if multiple_selected_paths != None:
+#              if path in multiple_selected_paths:
+#                nested_dict.fill_nested_dict(mc_datasets_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
+#            else:
+#              print('[Warning] '+path+' is not in multiple_selection. Will not select any dataset.')
+#              nested_dict.fill_nested_dict(mc_datasets_non_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
+#  return mc_datasets_selected, mc_datasets_non_selected
 
 def write_list(target_list, out_filename):
   with open(out_filename,'w') as out_file:
@@ -249,9 +248,9 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Selects datasets_jsons.')
   parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
   parser.add_argument('-d', '--data_tiers', metavar='"nanoaod,miniaod"', nargs=1, default=['nanoaod', 'miniaod'])
-  parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc'])
+  parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc,data'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
-  parser.add_argument('-ip', '--in_json_prefix', metavar='filtered_', nargs=1, default=['filtered_'])
+  parser.add_argument('-ip', '--in_json_prefix', metavar='selected_', nargs=1, default=['selected_'])
   parser.add_argument('-is', '--in_mc_multiple_selection_json', metavar='mc_multiple_selection.json', nargs=1, default=['mc_multiple_selection.json'])
   parser.add_argument('-o', '--out_results_folder', metavar='./results', nargs=1, default=['./results'])
   parser.add_argument('-op', '--out_results_prefix', metavar="''", nargs=1, default=[''])
@@ -280,8 +279,8 @@ if __name__ == '__main__':
   mc_multiple_selection_filename = os.path.join(args['in_json_folder'], args['in_mc_multiple_selection_json'])
 
   mc_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'mc_datasets.json')
-  bad_pu_mc_datasets_filename = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_pu_mc_datasets.json')
-  ps_weight_mc_datasets_filename = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_ps_weight_datasets.json')
+  #bad_pu_mc_datasets_filename = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_pu_mc_datasets.json')
+  #ps_weight_mc_datasets_filename = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_ps_weight_datasets.json')
 
   data_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'data_datasets.json')
 
@@ -321,22 +320,25 @@ if __name__ == '__main__':
     keys_mc_datasets = datasets.get_keys_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers)
 
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
-    mc_datasets = datasets.load_json_file(mc_datasets_filename)
-    datasets.check_false_none_mc_datasets(mc_datasets)
-
-    if os.path.isfile(mc_multiple_selection_filename):
-      print('[Info] Using '+mc_multiple_selection_filename+' to select files.')
-      # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
-      multiple_selection = datasets.load_json_file(mc_multiple_selection_filename)
-      # select paths according to multiple selection
-      mc_datasets_selected, mc_datasets_non_selected = select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection)
-    else:
-      print('[Info] No multiple selection file.')
-      mc_datasets_selected = mc_datasets 
-
-    # Do simple checks
+    mc_datasets_selected = datasets.load_json_file(mc_datasets_filename)
+    ## Do simple checks
+    datasets.check_false_none_mc_datasets(mc_datasets_selected)
     datasets.print_same_parent_mc_datasets(mc_datasets_selected)
     datasets.print_missing_mc_datasets(keys_mc_datasets, mc_datasets_selected)
+
+    #if os.path.isfile(mc_multiple_selection_filename):
+    #  print('[Info] Using '+mc_multiple_selection_filename+' to select files.')
+    #  # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
+    #  multiple_selection = datasets.load_json_file(mc_multiple_selection_filename)
+    #  # select paths according to multiple selection
+    #  mc_datasets_selected, mc_datasets_non_selected = select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection)
+    #else:
+    #  print('[Info] No multiple selection file.')
+    #  mc_datasets_selected = mc_datasets 
+
+    ## Do simple checks
+    #datasets.print_same_parent_mc_datasets(mc_datasets_selected)
+    #datasets.print_missing_mc_datasets(keys_mc_datasets, mc_datasets_selected)
 
     # Write to file
     if len(args['data_tiers']) == 2:

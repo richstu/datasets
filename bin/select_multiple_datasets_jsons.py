@@ -72,6 +72,18 @@ def are_arguments_valid(args):
       if overwrite == 'n':
         return False, t_path+' already exists.'
 
+    t_path = os.path.join(args['out_json_folder'], args['out_json_prefix']+'mc_datasets.json')
+    if os.path.isfile(t_path):
+      overwrite = ask.ask_key(t_path+' already exists. Do you want to overwrite? (y/n) Default is n. ', ['y','n'], 'n')
+      if overwrite == 'n':
+        return False, t_path+' already exists.'
+
+    t_path = os.path.join(args['out_json_folder'], args['out_json_prefix']+'data_datasets.json')
+    if os.path.isfile(t_path):
+      overwrite = ask.ask_key(t_path+' already exists. Do you want to overwrite? (y/n) Default is n. ', ['y','n'], 'n')
+      if overwrite == 'n':
+        return False, t_path+' already exists.'
+
   return True, ''
 
 
@@ -191,7 +203,8 @@ def print_multiple_select_simple(multiple_selection, search_string):
 def need_to_select(multiple_selection, multiple_selection_from_file, search_string):
   if search_string not in multiple_selection_from_file: return True
   if 'selected_paths' not in multiple_selection_from_file[search_string]: return True
-  if sorted(multiple_selection[search_string]['paths']) != sorted(multiple_selection_from_file[search_string]['paths']): return True
+  #if sorted(multiple_selection[search_string]['paths']) != sorted(multiple_selection_from_file[search_string]['paths']): return True
+  if multiple_selection[search_string]['paths'] != multiple_selection_from_file[search_string]['paths']: return True
   return False
 
 # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
@@ -214,7 +227,7 @@ def get_list_string(a_list):
 def print_multiple_dataset_info(search_string, multiple_selection, search_string_to_keys_mc_datasets, path_to_keys_mc_datasets, same_parent_paths, multiple_mc_datasets, mini_to_nanos_from_nanoaod, nano_to_mini_from_miniaod):
   print('search keys: ['+ get_list_string(search_string_to_keys_mc_datasets[search_string]) +'] : '+search_string)
   print('')
-  paths = sorted(multiple_selection[search_string]['paths'])
+  paths = multiple_selection[search_string]['paths']
   common_name = get_common_name(paths)
   if len(common_name) != 0:
     print('  COMMON_PATH: '+common_name)
@@ -301,7 +314,7 @@ def get_multiple_selection(multiple_mc_datasets, data_tiers):
       for year in multiple_mc_datasets[mc_dataset_name]:
         if data_tier in multiple_mc_datasets[mc_dataset_name][year]:
           mc_dataset_search_string = datasets.get_mc_dataset_search_string(mc_tag_meta, mc_dataset_name, year, data_tier)
-          paths = multiple_mc_datasets[mc_dataset_name][year][data_tier].keys()
+          paths = sorted(multiple_mc_datasets[mc_dataset_name][year][data_tier].keys())
           if mc_dataset_search_string not in multiple_selection:
             multiple_selection[mc_dataset_search_string] = {}
           else:
@@ -363,14 +376,37 @@ def get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, mc_d
       out_info_path += prefix + '    ' + child+'\n'
   out_info_path = out_info_path.rstrip()
   return out_info_path
+
+# multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
+def select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection):
+  mc_datasets_selected = {}
+  mc_datasets_non_selected = {}
+  for mc_dataset_name in mc_datasets:
+    for year in mc_datasets[mc_dataset_name]:
+      for data_tier in mc_datasets[mc_dataset_name][year]:
+        search_string = datasets.get_mc_dataset_search_string(mc_tag_meta, mc_dataset_name, year, data_tier)
+        multiple_selected_paths = None
+        if search_string in multiple_selection:
+          multiple_selected_paths = multiple_selection[search_string]['selected_paths']
+        if len(mc_datasets[mc_dataset_name][year][data_tier]) == 1: 
+          path = next(iter(mc_datasets[mc_dataset_name][year][data_tier]))
+          nested_dict.fill_nested_dict(mc_datasets_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
+        else:
+          for path in mc_datasets[mc_dataset_name][year][data_tier]:
+            if multiple_selected_paths != None:
+              if path in multiple_selected_paths:
+                nested_dict.fill_nested_dict(mc_datasets_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
+            else:
+              print('[Warning] '+path+' is not in multiple_selection. Will not select any dataset.')
+              nested_dict.fill_nested_dict(mc_datasets_non_selected, [mc_dataset_name, year, data_tier, path], mc_datasets[mc_dataset_name][year][data_tier][path])
+  return mc_datasets_selected, mc_datasets_non_selected
   
-# TODO Do selection for multiple data datasets
 if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='Selects datasets_jsons.')
   parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
   parser.add_argument('-d', '--data_tiers', metavar='"nanoaod,miniaod"', nargs=1, default=['nanoaod', 'miniaod'])
-  parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc'])
+  parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc,data'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-ip', '--in_json_prefix', metavar='filtered_', nargs=1, default=['filtered_'])
   parser.add_argument('-o', '--out_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
@@ -402,6 +438,8 @@ if __name__ == '__main__':
   data_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'data_datasets.json')
 
   multiple_selection_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'mc_multiple_selection.json')
+  selected_mc_datasets_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'mc_datasets.json')
+  selected_data_datasets_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'data_datasets.json')
 
   if make_mc_datasets:
     #data_tiers = ['miniaod']
@@ -437,6 +475,7 @@ if __name__ == '__main__':
     data_datasets = datasets.load_json_file(data_datasets_filename)
     datasets.check_false_none_data_datasets(data_datasets)
     datasets.print_multiple_data_datasets(data_datasets)
+    nested_dict.save_json_file(data_datasets, selected_data_datasets_filename)
 
   if make_mc_datasets:
     # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
@@ -488,9 +527,19 @@ if __name__ == '__main__':
       selected_dataset_indices = selected_result[0]
       reason = selected_result[1]
       update_selection(search_string, multiple_selection[search_string]['paths'], selected_dataset_indices, reason, multiple_selection_from_file)
-      datasets.save_json_file(multiple_selection_from_file, multiple_selection_filename)
+      nested_dict.save_json_file(multiple_selection_from_file, multiple_selection_filename)
       print('Saved to '+multiple_selection_filename)
       print('')
+
+    if multiple_selection_from_file != {}:
+      # Save final result to mc_datasets file
+      mc_datasets_selected, mc_datasets_non_selected = select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection_from_file)
+      # Do simple checks
+      datasets.print_same_parent_mc_datasets(mc_datasets_selected)
+      # Save results
+      nested_dict.save_json_file(mc_datasets_selected, selected_mc_datasets_filename)
+    
+
 
 
   #datasets.print_same_parent_mc_datasets(mc_datasets)
