@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import datasets
+import nested_dict
 import json
 import datetime
 import argparse
@@ -122,10 +123,10 @@ if __name__ == '__main__':
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
     mc_datasets = datasets.make_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers)
     #datasets.print_path_mc_datasets(mc_datasets)
-    datasets.save_json_file(mc_datasets, out_mc_datasets_filename)
+    nested_dict.save_json_file(mc_datasets, out_mc_datasets_filename)
 
   if make_data_datasets:
     # data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
     data_datasets = datasets.make_data_datasets(data_tag_meta, data_tiers)
     #datasets.print_path_data_datasets(data_datasets)
-    datasets.save_json_file(data_datasets, out_data_datasets_filename)
+    nested_dict.save_json_file(data_datasets, out_data_datasets_filename)

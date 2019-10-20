@@ -320,7 +320,7 @@ if __name__ == '__main__':
     keys_mc_datasets = datasets.get_keys_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers)
 
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
-    mc_datasets_selected = datasets.load_json_file(mc_datasets_filename)
+    mc_datasets_selected = nested_dict.load_json_file(mc_datasets_filename)
     ## Do simple checks
     datasets.check_false_none_mc_datasets(mc_datasets_selected)
     datasets.print_same_parent_mc_datasets(mc_datasets_selected)
@@ -329,7 +329,7 @@ if __name__ == '__main__':
     #if os.path.isfile(mc_multiple_selection_filename):
     #  print('[Info] Using '+mc_multiple_selection_filename+' to select files.')
     #  # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
-    #  multiple_selection = datasets.load_json_file(mc_multiple_selection_filename)
+    #  multiple_selection = nested_dict.load_json_file(mc_multiple_selection_filename)
     #  # select paths according to multiple selection
     #  mc_datasets_selected, mc_datasets_non_selected = select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection)
     #else:
@@ -361,7 +361,7 @@ if __name__ == '__main__':
 
   if make_data_datasets:
     # data_datasets[stream][year][run][data_tier] = [path, parent, runs]
-    data_datasets = datasets.load_json_file(data_datasets_filename)
+    data_datasets = nested_dict.load_json_file(data_datasets_filename)
     datasets.check_false_none_data_datasets(data_datasets)
 
     datasets.print_missing_data_datasets(keys_data_datasets, data_datasets)
@@ -380,8 +380,8 @@ if __name__ == '__main__':
   # ETC
   #nested_dict.remove_key_nested_dict(data_datasets, '/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD')
 
-  #bad_pu_mc_datasets = datasets.load_json_file(bad_pu_mc_datasets_filename)
-  #ps_weights_mc_datasets = datasets.load_json_file(ps_weight_mc_datasets_filename)
+  #bad_pu_mc_datasets = nested_dict.load_json_file(bad_pu_mc_datasets_filename)
+  #ps_weights_mc_datasets = nested_dict.load_json_file(ps_weight_mc_datasets_filename)
 
   ##full_mc_datasets = datasets.add_mc_datasets(mc_datasets, bad_pu_mc_datasets)
   ##datasets.print_same_parent_mc_datasets(mc_datasets)

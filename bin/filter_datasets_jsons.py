@@ -303,7 +303,7 @@ if __name__ == '__main__':
 
   if make_mc_datasets:
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
-    mc_datasets = datasets.load_json_file(mc_datasets_filename)
+    mc_datasets = nested_dict.load_json_file(mc_datasets_filename)
     datasets.check_overlapping_paths_mc_datasets(mc_datasets)
 
     #print(nested_dict.get_from_nested_dict(mc_datasets, '/DYJetsToLL_M-50_HT-70to100_TuneCP5_13TeV-madgraphMLM-pythia8/RunIIFall17MiniAODv2-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/MINIAODSIM'))
@@ -353,13 +353,13 @@ if __name__ == '__main__':
     print('Using bad pileup for below, because no other datasets')
     datasets.print_path_mc_datasets(bad_pu_mc_datasets)
 
-    datasets.save_json_file(pu_filtered_mc_datasets, out_filtered_mc_datasets_filename)
-    datasets.save_json_file(bad_pu_mc_datasets, out_bad_pu_mc_datasets_filename)
-    datasets.save_json_file(bad_ps_weights_mc_datasets, out_ps_weight_mc_datasets_filename)
+    nested_dict.save_json_file(pu_filtered_mc_datasets, out_filtered_mc_datasets_filename)
+    nested_dict.save_json_file(bad_pu_mc_datasets, out_bad_pu_mc_datasets_filename)
+    nested_dict.save_json_file(bad_ps_weights_mc_datasets, out_ps_weight_mc_datasets_filename)
 
   if make_data_datasets:
     # data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events":int, "runs":[]}
-    data_datasets = datasets.load_json_file(data_datasets_filename)
+    data_datasets = nested_dict.load_json_file(data_datasets_filename)
     datasets.check_overlapping_paths_data_datasets(data_datasets)
 
     #print_multiple_data_datasets(data_datasets)
@@ -371,4 +371,4 @@ if __name__ == '__main__':
     #datasets.print_path_data_datasets(filtered_data_datasets)
     check_common_runs_data_datasets(filtered_data_datasets)
 
-    datasets.save_json_file(filtered_data_datasets, out_filtered_data_datasets_filename)
+    nested_dict.save_json_file(filtered_data_datasets, out_filtered_data_datasets_filename)

@@ -131,7 +131,7 @@ def auto_select_extension(multiple_selection, multiple_selection_from_file, mult
       print('  '+longer_path.replace(common_name, '|COMMON_PATH|'))
       #multiple_selection[search_string] = {'paths': info['paths'], 'selected_paths': info['paths'], 'reason': 'Auto-selected for extension file.'}
       update_selection(search_string, multiple_selection[search_string]['paths'], [0,1], 'Auto-selected for extension file.', multiple_selection_from_file)
-      datasets.save_json_file(multiple_selection_from_file, multiple_selection_filename)
+      nested_dict.save_json_file(multiple_selection_from_file, multiple_selection_filename)
 
 def get_info_path_string_mc_datasets(path, mc_datasets, prefix):
   out_info_path = ''
@@ -460,7 +460,7 @@ if __name__ == '__main__':
 
   if make_mc_datasets:
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
-    mc_datasets = datasets.load_json_file(mc_datasets_filename)
+    mc_datasets = nested_dict.load_json_file(mc_datasets_filename)
     datasets.check_false_none_mc_datasets(mc_datasets)
 
     # Make meta data
@@ -472,7 +472,7 @@ if __name__ == '__main__':
     nano_to_mini_from_miniaod = datasets.get_nano_to_mini_from_miniaod_mc_datasets(mc_datasets)
 
   if make_data_datasets:
-    data_datasets = datasets.load_json_file(data_datasets_filename)
+    data_datasets = nested_dict.load_json_file(data_datasets_filename)
     datasets.check_false_none_data_datasets(data_datasets)
     datasets.print_multiple_data_datasets(data_datasets)
     nested_dict.save_json_file(data_datasets, selected_data_datasets_filename)
@@ -482,7 +482,7 @@ if __name__ == '__main__':
     # Load multiple_selection from file
     multiple_selection_from_file = {}
     if os.path.exists(multiple_selection_filename):
-      multiple_selection_from_file = datasets.load_json_file(multiple_selection_filename)
+      multiple_selection_from_file = nested_dict.load_json_file(multiple_selection_filename)
     # Load multiple_selection from json
     multiple_selection = get_multiple_selection(multiple_mc_datasets, data_tiers)
 

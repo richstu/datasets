@@ -2,8 +2,8 @@
 import multiprocessing
 import subprocess
 import json
-import datasets
 import dataset_files
+import nested_dict
 import argparse
 import os
 import sys
@@ -85,7 +85,7 @@ def combine_dataset_files_info(dataset_files_info_a, dataset_files_info_b):
 def update_datasets_files_json(path_datasets_filename, in_dataset_files_info_filename, out_dataset_files_info_filename):
   list_dataset = dataset_files.get_list_dataset(path_datasets_filename)
   #dataset_files_info[dataset][filename] = {'number_events':number_events}
-  in_dataset_files_info = datasets.load_json_file(in_dataset_files_info_filename)
+  in_dataset_files_info = nested_dict.load_json_file(in_dataset_files_info_filename)
 
   in_list_dataset = in_dataset_files_info.keys()
   append_list_dataset = list(set(list_dataset) - set(in_list_dataset))
@@ -108,7 +108,7 @@ def update_datasets_files_json(path_datasets_filename, in_dataset_files_info_fil
   print('appended list_dataset: ',str(append_list_dataset))
   print('removed list_dataset: ',str(remove_list_dataset))
 
-  datasets.save_json_file(out_dataset_files_info, out_dataset_files_info_filename)
+  nested_dict.save_json_file(out_dataset_files_info, out_dataset_files_info_filename)
 
 
 if __name__ == '__main__':

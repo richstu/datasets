@@ -365,24 +365,24 @@ def convert_list_to_data_datasets(data_datasets_list):
       nested_dict.fill_nested_dict(data_datasets, keys, path_info)
   return data_datasets
 
-def save_json_file(dict_name, json_filename):
-  with open(json_filename,'w') as json_file:
-    json.dump(dict_name, json_file, indent=2)
-  print('Saved '+json_filename)
+#def save_json_file(dict_name, json_filename):
+#  with open(json_filename,'w') as json_file:
+#    json.dump(dict_name, json_file, indent=2)
+#  print('Saved '+json_filename)
 
-def ascii_encode_dict(data):
-    ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
-    return dict(map(ascii_encode, pair) for pair in data.items())
+#def ascii_encode_dict(data):
+#    ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
+#    return dict(map(ascii_encode, pair) for pair in data.items())
 
-def load_json_file(json_filename, no_null=True):
-  with open(json_filename) as json_file:
-    out_dict = json.load(json_file, object_hook=ascii_encode_dict)
-  #nested_dict.check_key_nested_dict(out_dict, 'null')
-  if no_null:
-    nested_dict.remove_key_nested_dict(out_dict, 'null')
-    nested_dict.check_key_nested_dict(out_dict, 'null')
-    nested_dict.check_key_nested_dict(out_dict, None)
-  return out_dict
+#def load_json_file(json_filename, no_null=True):
+#  with open(json_filename) as json_file:
+#    out_dict = json.load(json_file, object_hook=ascii_encode_dict)
+#  #nested_dict.check_key_nested_dict(out_dict, 'null')
+#  if no_null:
+#    nested_dict.remove_key_nested_dict(out_dict, 'null')
+#    nested_dict.check_key_nested_dict(out_dict, 'null')
+#    nested_dict.check_key_nested_dict(out_dict, None)
+#  return out_dict
 
 # path_to_keys_mc_datasets[path] = [key]
 def get_path_to_keys_mc_datasets(mc_datasets):
