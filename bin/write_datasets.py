@@ -353,7 +353,7 @@ if __name__ == '__main__':
       # Write extra files
       write_missing_mc_datasets_with_data_tier(keys_mc_datasets, mc_datasets_selected,  args['data_tiers'][0], out_empty_mc_datasets_filename)
       # Write bad pu
-      bad_pu_mc_datasets = filter_datasets_jsons.get_unrejected_if_possible_mc_datasets(mc_datasets_selected, datasets.reject_bad_pu_2017_mc_datasets)
+      bad_pu_mc_datasets = filter_datasets_jsons.get_unrejected_if_possible_mc_datasets(mc_datasets_selected, filter_datasets_jsons.reject_bad_pu_2017_mc_datasets)
       write_path_mc_datasets_with_data_tier(bad_pu_mc_datasets, args['data_tiers'][0], out_path_bad_pu_mc_datasets_filename)
       # Write bad ps_weight
       bad_ps_weights_mc_datasets = filter_datasets_jsons.get_unrejected_if_possible_mc_datasets(mc_datasets_selected, filter_datasets_jsons.reject_string_ignore_case_mc_datasets, 'PSweights')
