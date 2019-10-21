@@ -1,7 +1,7 @@
 rm -rf jsons
 rm -rf results
 rm -rf updated_results
-rm -rf updated_results
+rm -rf updated_jsons
 rm -rf files
 #mkdir jsons
 #mkdir results

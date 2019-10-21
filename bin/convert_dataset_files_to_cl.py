@@ -68,9 +68,9 @@ def are_arguments_valid(args):
     if not os.path.isfile(t_path):
       return False, t_path+' does not exists.'
 
-  # Check if files exists 
-  if not os.path.isfile(args['in_dataset_files_info']):
-    return False, args['in_dataset_files_info']+' does not exists.'
+  ## Check if files exists 
+  #if not os.path.isfile(args['in_dataset_files_info']):
+  #  return False, args['in_dataset_files_info']+' does not exists.'
 
   if not os.path.isdir(args['target_base']):
     return False, args['target_base']+' does not exists.'
@@ -568,19 +568,19 @@ if __name__ == '__main__':
 
 
   # Make list of files to download
-  #print(disk_file_info)
   for filename in target_file_info:
     if filename not in disk_file_info: files_to_download.append(filename)
     else:
-      if target_file_info[filename][0] != disk_file_info[filename]:
+      if target_file_info[filename] != disk_file_info[filename]:
         print('Events for '+filename+' is different. target:'+target_file_info[filename]+ ' disk:'+disk_file_info[filename]+'. Adding to download list and remove list.')
         files_to_download.append(filename)
         files_to_remove.append(filename)
 
-  print('Files to download')
-  for x in files_to_download: print('  '+x)
-  print('Files_to_remove')
-  for x in files_to_remove: print('  '+x)
+  #print('Files to download')
+  #for x in files_to_download: print('  '+x)
+  if len(files_to_remove) != 0:
+    print('Files_to_remove')
+    for x in files_to_remove: print('  '+x)
 
   #for filename in target_file_info:
   #  files_to_download.append(filename)

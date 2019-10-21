@@ -982,7 +982,7 @@ def parsed_to_mc_filename(parsed_filename):
 # mc_filename: /store/mc/RunIISummer16NanoAODv5/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/120000/222071C0-CF04-1E4B-B65E-49D18B91DE8B.root
 def parsed_to_data_filename(parsed_filename):
   parsed_filename_split = parsed_filename.split('__')
-  filename = '/store/data/'+parsed_filename_split[1]+'/'+parsed_filename_split[0]+'/NANOAODSIM/'+parsed_filename_split[2]+'/'+parsed_filename_split[3]+'/'+parsed_filename_split[4]
+  filename = '/store/data/'+parsed_filename_split[1]+'/'+parsed_filename_split[0]+'/NANOAOD/'+parsed_filename_split[2]+'/'+parsed_filename_split[3]+'/'+parsed_filename_split[4]
   return filename
 
 

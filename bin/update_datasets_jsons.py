@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='Updates datasets_jsons using dasgoclient.')
   parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
-  parser.add_argument('-d', '--data_tiers', metavar='"nanoaod,miniaod"', nargs=1, default=['nanoaod', 'miniaod'])
+  parser.add_argument('-d', '--data_tiers', metavar='"nanoaod"', nargs=1, default=['nanoaod'])
   parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc,data'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-ip', '--in_json_prefix', metavar='', nargs=1, default=[''])
