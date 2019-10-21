@@ -52,7 +52,7 @@ def get_file_nanomc_info(base_folder, mc_disk_filename_with_base):
   year = int(mc_disk_filename_split[2])
   mc_dir = mc_disk_filename_split[3]
   parsed_mc_filename = mc_disk_filename_split[4]
-  mc_filename = datasets.parsed_to_mc_filename(parsed_to_mc_filename)
+  mc_filename = datasets.parsed_to_mc_filename(parsed_mc_filename)
   #parsed_mc_filename_split = parsed_mc_filename.split('__')
   #mc_filename = '/store/mc/'+parsed_mc_filename_split[1]+'/'+parsed_mc_filename_split[0]+'/NANOAODSIM/'+parsed_mc_filename_split[2]+'/'+parsed_mc_filename_split[3]+'/'+parsed_mc_filename_split[4]
   file_events = -1
@@ -64,20 +64,60 @@ def get_file_nanomc_info(base_folder, mc_disk_filename_with_base):
     print('Failed to get events for '+mc_disk_filename_with_base)
   return mc_filename, year, nanoaod_tag, file_events, mc_dir
 
-# mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
-def fill_mc_disk_files(mc_disk_files, data_tier, filename, year, nanoaod_tag, file_events, mc_dir):
-  if data_tier not in mc_disk_files:
-    mc_disk_files[data_tier] = {}
-  if nanoaod_tag not in mc_disk_files[data_tier]:
-    mc_disk_files[data_tier][nanoaod_tag] = {}
-  if year not in mc_disk_files[data_tier][nanoaod_tag]:
-    mc_disk_files[data_tier][nanoaod_tag][year] = {}
-  if mc_dir not in mc_disk_files[data_tier][nanoaod_tag][year]:
-    mc_disk_files[data_tier][nanoaod_tag][year][mc_dir] = {}
-  if filename not in mc_disk_files[data_tier][nanoaod_tag][year][mc_dir]:
-    mc_disk_files[data_tier][nanoaod_tag][year][mc_dir][filename] = {'file_events': file_events}
+# file_mc: NanoAODv5/Nano/2016/mc/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__37FA68CC-B841-7D41-994C-645CFA4BA227.root
+# parsed_data_filename: ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__37FA68CC-B841-7D41-994C-645CFA4BA227.root
+# data_filename: /store/mc/RunIISummer16NanoAODv5/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/120000/222071C0-CF04-1E4B-B65E-49D18B91DE8B.root
+# file_nanodata_info = (data_filename, year, nanoaod_tag, file_events, data_dir)
+def get_file_nanodata_info(base_folder, data_disk_filename_with_base):
+  data_disk_filename = data_disk_filename_with_base[len(base_folder)+1:]
+  data_disk_filename_split = data_disk_filename.split('/')
+  nanoaod_tag = data_disk_filename_split[0]
+  year = int(data_disk_filename_split[2])
+  data_dir = data_disk_filename_split[3]
+  parsed_data_filename = data_disk_filename_split[4]
+  data_filename = datasets.parsed_to_data_filename(parsed_data_filename)
+  #parsed_data_filename_split = parsed_data_filename.split('__')
+  #data_filename = '/store/mc/'+parsed_data_filename_split[1]+'/'+parsed_data_filename_split[0]+'/NANOAODSIM/'+parsed_data_filename_split[2]+'/'+parsed_data_filename_split[3]+'/'+parsed_data_filename_split[4]
+  file_events = -1
+  try:
+    root_file = ROOT.TFile.Open(data_disk_filename_with_base)
+    root_tree = root_file.Get('Events')
+    file_events = root_tree.GetEntries()
+  except:
+    print('Failed to get events for '+data_disk_filename_with_base)
+  return data_filename, year, nanoaod_tag, file_events, data_dir
+
+
+## mc_disk_files[data_tier][aod_tag][year][mc_data_dir][filename] = {'file_events': int}
+#def fill_mc_disk_files(mc_disk_files, data_tier, filename, year, nanoaod_tag, file_events, mc_dir):
+#  if data_tier not in mc_disk_files:
+#    mc_disk_files[data_tier] = {}
+#  if nanoaod_tag not in mc_disk_files[data_tier]:
+#    mc_disk_files[data_tier][nanoaod_tag] = {}
+#  if year not in mc_disk_files[data_tier][nanoaod_tag]:
+#    mc_disk_files[data_tier][nanoaod_tag][year] = {}
+#  if mc_dir not in mc_disk_files[data_tier][nanoaod_tag][year]:
+#    mc_disk_files[data_tier][nanoaod_tag][year][mc_dir] = {}
+#  if filename not in mc_disk_files[data_tier][nanoaod_tag][year][mc_dir]:
+#    mc_disk_files[data_tier][nanoaod_tag][year][mc_dir][filename] = {'file_events': file_events}
+#  else:
+#    print('[Warning] mc_disk_files['+data_tier+']['+nanoaod_tag+']['+str(year)+']['+mc_dir+']['+filename+'] already exists')
+
+# disk_files[data_tier][aod_tag][year][disk_dir][filename] = {'file_events': int}
+def fill_disk_files(disk_files, data_tier, filename, year, nanoaod_tag, file_events, disk_dir):
+  if data_tier not in disk_files:
+    disk_files[data_tier] = {}
+  if nanoaod_tag not in disk_files[data_tier]:
+    disk_files[data_tier][nanoaod_tag] = {}
+  if year not in disk_files[data_tier][nanoaod_tag]:
+    disk_files[data_tier][nanoaod_tag][year] = {}
+  if disk_dir not in disk_files[data_tier][nanoaod_tag][year]:
+    disk_files[data_tier][nanoaod_tag][year][disk_dir] = {}
+  if filename not in disk_files[data_tier][nanoaod_tag][year][disk_dir]:
+    disk_files[data_tier][nanoaod_tag][year][disk_dir][filename] = {'file_events': file_events}
   else:
-    print('[Warning] mc_disk_files['+data_tier+']['+nanoaod_tag+']['+str(year)+']['+mc_dir+']['+filename+'] already exists')
+    print('[Warning] disk_files['+data_tier+']['+nanoaod_tag+']['+str(year)+']['+disk_dir+']['+filename+'] already exists')
+
 
 # mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
 def make_mc_disk_files(base_folder):
@@ -91,10 +131,22 @@ def make_mc_disk_files(base_folder):
     print('Processing '+mc_disk_filename)
     # mc_disk_files[nanoaod_tag][year][mc_dir][filename] = {'file_events': int}
     mc_filename, year, nanoaod_tag, file_events, mc_dir = get_file_nanomc_info(base_folder, mc_disk_filename)
-    fill_mc_disk_files(mc_disk_files, 'nanoaod', mc_filename, year, nanoaod_tag, file_events, mc_dir)
+    #fill_mc_disk_files(mc_disk_files, 'nanoaod', mc_filename, year, nanoaod_tag, file_events, mc_dir)
+    fill_disk_files(mc_disk_files, 'nanoaod', mc_filename, year, nanoaod_tag, file_events, mc_dir)
   return mc_disk_files
 
-# TODO: Do for data
+# data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
+def make_data_disk_files(base_folder):
+  # Fill nanoaod info
+  data_disk_filenames = glob.glob(base_folder+'/*/Nano/*/data/*.root')
+  data_disk_files = {}
+  for data_disk_filename in data_disk_filenames:
+    print('Processing '+data_disk_filename)
+    # data_disk_files[nanoaod_tag][year][data_dir][filename] = {'file_events': int}
+    data_filename, year, nanoaod_tag, file_events, data_dir = get_file_nanodata_info(base_folder, data_disk_filename)
+    fill_disk_files(data_disk_files, 'nanoaod', data_filename, year, nanoaod_tag, file_events, data_dir)
+  return data_disk_files
+
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Makes disk_files.jsons.')
@@ -123,3 +175,8 @@ if __name__ == "__main__":
     # mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
     mc_disk_files = make_mc_disk_files(base_folder)
     nested_dict.save_json_file(mc_disk_files, mc_disk_files_filename)
+
+  if do_data:
+    # data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
+    data_disk_files = make_data_disk_files(base_folder)
+    nested_dict.save_json_file(data_disk_files, data_disk_files_filename)

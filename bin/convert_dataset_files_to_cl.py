@@ -101,7 +101,7 @@ def make_data_database_tables(cursor):
   #cursor.execute('SELECT * FROM data_files')
   cursor.execute('CREATE TABLE data_datasets(path text PRIMARY KEY, stream text NOT NULL, year integer, run_group text NOT NULL, data_tier text NOT NULL, creation_time integer, size integer, files integer, events integer, lumis integer);')
   #cursor.execute('SELECT * FROM data_datasets')
-  cursor.execute('CREATE TABLE data_tags(id integer PRIMARY KEY, stream text NOT NULL, year integer, run_group text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL);')
+  cursor.execute('CREATE TABLE data_tags(id integer PRIMARY KEY, stream text NOT NULL, year integer, run_group text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL, nanoaodsim_tag text NOT NULL);')
   #cursor.execute('SELECT * FROM data_tags')
   cursor.execute('CREATE TABLE data_children(child_path text PRIMARY KEY, path text NOT NULL);')
   #cursor.execute('SELECT * FROM data_children')
@@ -238,8 +238,9 @@ def fill_data_tags_database(cursor, data_tag_meta):
       for stream in data_tag_meta[year][run_group]:
         miniaod_tag = data_tag_meta[year][run_group][stream]['miniaod']
         nanoaod_tag = data_tag_meta[year][run_group][stream]['nanoaod']
+        nanoaodsim_tag = data_tag_meta[year][run_group][stream]['nanoaodsim']
         index += 1
-        cursor.execute('INSERT INTO data_tags (id, stream, year, run_group, miniaod_tag, nanoaod_tag) VALUES (?, ?, ?, ?, ?, ?)',(index, stream, year, run_group, miniaod_tag, nanoaod_tag))
+        cursor.execute('INSERT INTO data_tags (id, stream, year, run_group, miniaod_tag, nanoaod_tag, nanoaodsim_tag) VALUES (?, ?, ?, ?, ?, ?, ?)',(index, stream, year, run_group, miniaod_tag, nanoaod_tag, nanoaodsim_tag))
 
 # data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
 def fill_data_children_database(cursor, data_datasets):
@@ -288,6 +289,9 @@ def fill_data_parent_database(cursor, data_datasets):
 def make_mc_disk_database(cursor):
   cursor.execute('CREATE TABLE mc_disk (filename text PRIMARY KEY, data_tier text NO NULL, year integer, aod_tag text NO NULL, file_events integer, mc_dir text NO NULL);')
 
+def make_data_disk_database(cursor):
+  cursor.execute('CREATE TABLE data_disk (filename text PRIMARY KEY, data_tier text NO NULL, year integer, aod_tag text NO NULL, file_events integer, data_dir text NO NULL);')
+
 ## mc_disk_files[nanoaod_tag][year][mc_dir][filename] = {'file_events': int}
 #def fill_mc_disk_files(mc_disk_files, filename, year, nanoaod_tag, file_events, mc_dir):
 #  if nanoaod_tag not in mc_disk_files:
@@ -331,23 +335,40 @@ def fill_mc_disk_database(cursor, mc_disk_files):
            file_events = mc_disk_files[data_tier][aod_tag][year][mc_dir][filename]['file_events']
            cursor.execute('INSERT INTO mc_disk (filename, data_tier, year, aod_tag, file_events, mc_dir) VALUES (?, ?, ?, ?, ?, ?)', (filename, data_tier, year, aod_tag, file_events, mc_dir))
 
+# data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
+def fill_data_disk_database(cursor, data_disk_files):
+  #print(data_disk_files)
+  for data_tier in data_disk_files:
+    for aod_tag in data_disk_files[data_tier]:
+      for year in data_disk_files[data_tier][aod_tag]:
+       for data_dir in data_disk_files[data_tier][aod_tag][year]:
+         for filename in data_disk_files[data_tier][aod_tag][year][data_dir]:
+           file_events = data_disk_files[data_tier][aod_tag][year][data_dir][filename]['file_events']
+           cursor.execute('INSERT INTO data_disk (filename, data_tier, year, aod_tag, file_events, data_dir) VALUES (?, ?, ?, ?, ?, ?)', (filename, data_tier, year, aod_tag, file_events, data_dir))
+
 def print_mc_disk_database(cursor):
   cursor.execute('SELECT * FROM mc_disk')
   print([description[0] for description in cursor.description])
   print(cursor.fetchall())
 
+def print_data_disk_database(cursor):
+  cursor.execute('SELECT * FROM data_disk')
+  print([description[0] for description in cursor.description])
+  print(cursor.fetchall())
+
+
 if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='Makes command lines from mc_dataset_files_info.')
-  parser.add_argument('in_dataset_files_info', metavar='./jsons/DATASET_FILES_INFO.json')
+  #parser.add_argument('in_dataset_files_info', metavar='./jsons/DATASET_FILES_INFO.json')
+  parser.add_argument('mc_data_sig', metavar='"mc,data,sig"', nargs=1, default=['mc'])
   parser.add_argument('target_base', metavar='/mnt/hadoop/pico')
   parser.add_argument('out_command_lines', metavar='./results/CL_DATASET_FILES_INFO.py')
-  parser.add_argument('mc_data_sig', metavar='"mc,data,sig"', nargs=1, default=['mc'])
   parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-if', '--in_files_prefix', metavar='', nargs=1, default=[''])
   parser.add_argument('-id', '--in_datasets_prefix', metavar='selected_', nargs=1, default=['selected_'])
-  parser.add_argument('-ik', '--in_disk_prefix', metavar='', nargs=1, default=[''])
+  parser.add_argument('-ik', '--in_disk_prefix', metavar="''", nargs=1, default=[''])
   parser.add_argument('-s', '--sql_search', metavar="''", nargs=1, default=[''])
 
   args = vars(parser.parse_args())
@@ -377,6 +398,7 @@ if __name__ == '__main__':
   #mc_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'mc_datasets.json')
 
   mc_disk_files_filename = os.path.join(args['in_json_folder'], args['in_disk_prefix']+'mc_disk_files.json')
+  data_disk_files_filename = os.path.join(args['in_json_folder'], args['in_disk_prefix']+'data_disk_files.json')
 
   #data_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'data_datasets.json')
   do_mc = False
@@ -451,32 +473,35 @@ if __name__ == '__main__':
     sql_search_term = 'WHERE mc_dir = "'+args['mc_data_sig'][0]+'"'
     sql_search_term += ' '+search_term
     cursor.execute('SELECT filename, mc_files.path AS path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir, mc_tags.year_tag AS year_tag, mc_tags.miniaod_tag AS miniaod_tag, mc_tags.nanoaod_tag AS nanoaod_tag FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path INNER JOIN mc_tags ON mc_tags.year = mc_datasets.year  '+sql_search_term+';')
+    # target_file_info[filename] = (file_events, mid_folder)
     target_file_info = {}
     for file_info in cursor.fetchall():
       filename = file_info[0]
       file_events = file_info[2]
       year = file_info[5]
       nanoaod_tag = file_info[14]
+      target_file_info[filename] = file_events
       if mid_folder == "": mid_folder = nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]
       else: 
         if mid_folder != nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]:
           print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0])
-         
-      target_file_info[filename] = file_events, mid_folder
     #print(target_file_info)
+
+    # Find existing files
     cursor.execute('SELECT filename, file_events FROM mc_disk;')
     disk_file_info = {}
     for filename, file_events in cursor.fetchall():
       disk_file_info[filename] = file_events
-    #print(disk_file_info)
-    for filename in target_file_info:
-      if filename not in disk_file_info: files_to_download.append(filename)
-      else:
-        if target_file_info[filename][0] != disk_file_info[filename]:
-          print('Events for '+filename+' is different. target:'+target_file_info[filename]+ ' disk:'+disk_file_info[filename]+'. Adding to download list and remove list.')
-          mid_folder = target_file_info[filename][1]
-          files_to_download.append((filename, mid_folder))
-          files_to_remove.append(filename)
+
+    ## Make list of files to download
+    ##print(disk_file_info)
+    #for filename in target_file_info:
+    #  if filename not in disk_file_info: files_to_download.append(filename)
+    #  else:
+    #    if target_file_info[filename][0] != disk_file_info[filename]:
+    #      print('Events for '+filename+' is different. target:'+target_file_info[filename]+ ' disk:'+disk_file_info[filename]+'. Adding to download list and remove list.')
+    #      files_to_download.append(filename)
+    #      files_to_remove.append(filename)
     #print('files_to_download',str(files_to_download))
     #print('files_to_remove', str(files_to_remove))
 
@@ -510,19 +535,55 @@ if __name__ == '__main__':
     #  pass
     ##print(data_files)
 
-    # TODO Do disk comparison for target files
     # Make file_data_database
+    # data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
+    make_data_disk_database(cursor)
+    if os.path.isfile(data_disk_files_filename):
+      data_disk_files = nested_dict.load_json_file(data_disk_files_filename)
+      fill_data_disk_database(cursor, data_disk_files)
+      #print_data_disk_database(cursor)
+
     # Find files to download
     sql_search_term = '' if search_term == '' else 'WHERE '+search_term
-    cursor.execute('SELECT filename, data_files.path AS path, file_events, file_size, data_datasets.stream AS stream, data_datasets.year AS year, data_datasets.run_group AS run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis as lumis FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path '+sql_search_term+';')
+    cursor.execute('SELECT filename, data_files.path AS path, file_events, file_size, data_datasets.stream AS stream, data_datasets.year AS year, data_datasets.run_group AS run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis AS lumis, data_tags.miniaod_tag AS miniaod_tag, data_tags.nanoaod_tag AS nanoaod_tag, data_tags.nanoaodsim_tag AS nanoaodsim_tag FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path INNER JOIN data_tags ON data_tags.year = data_datasets.year AND data_tags.run_group = data_datasets.run_group AND data_tags.stream = data_datasets.stream '+sql_search_term+';')
     #cursor.execute('SELECT filename, file_events FROM data_files;')
     target_file_info = {}
     for file_info in cursor.fetchall():
       filename = file_info[0]
       file_events = file_info[2]
+      year = file_info[5]
+      nanoaod_tag = file_info[14]
       target_file_info[filename] = file_events
-    for filename in target_file_info:
-      files_to_download.append(filename)
+      if mid_folder == "": mid_folder = nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]
+      else: 
+        if mid_folder != nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]:
+          print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0])
+    #print(target_file_info)
+
+    # Find existing files
+    cursor.execute('SELECT filename, file_events FROM data_disk;')
+    disk_file_info = {}
+    for filename, file_events in cursor.fetchall():
+      disk_file_info[filename] = file_events
+
+
+  # Make list of files to download
+  #print(disk_file_info)
+  for filename in target_file_info:
+    if filename not in disk_file_info: files_to_download.append(filename)
+    else:
+      if target_file_info[filename][0] != disk_file_info[filename]:
+        print('Events for '+filename+' is different. target:'+target_file_info[filename]+ ' disk:'+disk_file_info[filename]+'. Adding to download list and remove list.')
+        files_to_download.append(filename)
+        files_to_remove.append(filename)
+
+  print('Files to download')
+  for x in files_to_download: print('  '+x)
+  print('Files_to_remove')
+  for x in files_to_remove: print('  '+x)
+
+  #for filename in target_file_info:
+  #  files_to_download.append(filename)
 
   # Make script for downloading
   target_folder = os.path.join(args['target_base'], mid_folder)

@@ -90,6 +90,7 @@ def parse_mc_tag_meta(tag_meta_filename):
 
 # data_tag_meta[year][run_group][streams][data_tier] = reco_tag
 # Ex) data_tag_meta[2016][B][MET][miniaod] = 17Jul2018
+# Ex) data_tag_meta[2016][B][MET][nanoaodsim] = NanoAODv5
 def parse_data_tag_meta(data_tag_meta_filename):
   data_tag_meta = {}
   with open(data_tag_meta_filename) as data_tag_meta_file:
@@ -97,7 +98,7 @@ def parse_data_tag_meta(data_tag_meta_filename):
       if line[0]=='#': continue
       if '#' in line: line_clean = line.split('#')[0].rstrip()
       else: line_clean = line.rstrip()
-      year, miniaod_reco_tag, nanoaod_reco_tag, streams_tag, runs_tag = line_clean.split(' ')
+      year, miniaod_reco_tag, nanoaod_reco_tag, streams_tag, runs_tag, nanoaodsim_tag = line_clean.split(' ')
       streams = streams_tag.split(',')
       runs = runs_tag.split(',')
       for run in runs:
@@ -110,6 +111,7 @@ def parse_data_tag_meta(data_tag_meta_filename):
             data_tag_meta[year][run][stream] = {}
           data_tag_meta[year][run][stream]['miniaod'] = miniaod_reco_tag
           data_tag_meta[year][run][stream]['nanoaod'] = nanoaod_reco_tag
+          data_tag_meta[year][run][stream]['nanoaodsim'] = nanoaodsim_tag
     return data_tag_meta
 
 def get_data_tier_tag(data_tier, is_data):
