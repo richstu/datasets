@@ -12,12 +12,68 @@ import glob
 import ROOT
 
 def are_arguments_valid(args):
+  # Will not check for mc_data_sig. Can't know what nanoaod_tag will be.
+  #if not argparse_helper.is_valid(args, 'mc_data', ['mc', 'data']):
+  #  return False, 'mc_data: '+str(args['mc_data'])+' is not valid.'
+
+  if len(args['mc_data_sig']) != 1:
+    return False, 'mc_data: '+str(args['mc_data_sig'])+' is not valid. Must choose only one.'
+
+  # Check for meta files
+  if not os.path.isdir(args['meta_folder']):
+    return False, 'meta_folder: '+args['meta_folder']+" doesn't exist."
+
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_common_names')
+  if not os.path.isfile(os.path.join(t_path)):
+    return False, 'meta_mc_dataset_common: '+t_path+" doesn't exist."
+
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_2016_names')
+  if not os.path.isfile(os.path.join(t_path)):
+    return False, 'meta_mc_dataset_2016_names: '+t_path+" doesn't exist."
+
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_2017_names')
+  if not os.path.isfile(os.path.join(t_path)):
+    return False, 'meta_mc_dataset_2017_names: '+t_path+" doesn't exist."
+
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_2018_names')
+  if not os.path.isfile(os.path.join(t_path)):
+    return False, 'meta_mc_dataset_2018_names: '+t_path+" doesn't exist."
+
+  if 'data' not in args['mc_data_sig']:
+    t_path = os.path.join(args['meta_folder'],'mc_tag_meta')
+    if not os.path.isfile(os.path.join(t_path)):
+      return False, 'meta_mc_tag_meta: '+t_path+" doesn't exist."
+
+  if 'data' in args['mc_data_sig']:
+    t_path = os.path.join(args['meta_folder'],'data_tag_meta')
+    if not os.path.isfile(os.path.join(t_path)):
+      return False, 'meta_data_tag_meta: '+t_path+" doesn't exist."
+ 
   # Check if files exists with in_json_prefix
+  if 'data' not in args['mc_data_sig']:
+    t_path = os.path.join(args['in_json_folder'], args['in_datasets_prefix']+'mc_datasets.json')
+    if not os.path.isfile(t_path):
+      return False, t_path+' does not exists.'
+
+    t_path = os.path.join(args['in_json_folder'], args['in_files_prefix']+'mc_dataset_files_info.json')
+    if not os.path.isfile(t_path):
+      return False, t_path+' does not exists.'
+
+  if 'data' in args['mc_data_sig']:
+    t_path = os.path.join(args['in_json_folder'], args['in_datasets_prefix']+'data_datasets.json')
+    if not os.path.isfile(t_path):
+      return False, t_path+' does not exists.'
+
+    t_path = os.path.join(args['in_json_folder'], args['in_files_prefix']+'data_dataset_files_info.json')
+    if not os.path.isfile(t_path):
+      return False, t_path+' does not exists.'
+
+  # Check if files exists 
   if not os.path.isfile(args['in_dataset_files_info']):
     return False, args['in_dataset_files_info']+' does not exists.'
 
-  if not os.path.isdir(args['target_directory']):
-    return False, args['target_directory']+' does not exists.'
+  if not os.path.isdir(args['target_base']):
+    return False, args['target_base']+' does not exists.'
 
   # Check if files exists with out_jsons_prefix 
   if os.path.isfile(args['out_command_lines']):
@@ -266,7 +322,7 @@ def make_mc_disk_database(cursor):
 
 # mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
 def fill_mc_disk_database(cursor, mc_disk_files):
-  print(mc_disk_files)
+  #print(mc_disk_files)
   for data_tier in mc_disk_files:
     for aod_tag in mc_disk_files[data_tier]:
       for year in mc_disk_files[data_tier][aod_tag]:
@@ -284,11 +340,18 @@ if __name__ == '__main__':
 
   parser = argparse.ArgumentParser(description='Makes command lines from mc_dataset_files_info.')
   parser.add_argument('in_dataset_files_info', metavar='./jsons/DATASET_FILES_INFO.json')
-  parser.add_argument('target_directory', metavar='/mnt/hadoop/jbkim/Download')
+  parser.add_argument('target_base', metavar='/mnt/hadoop/pico')
   parser.add_argument('out_command_lines', metavar='./results/CL_DATASET_FILES_INFO.py')
+  parser.add_argument('mc_data_sig', metavar='"mc,data,sig"', nargs=1, default=['mc'])
+  parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
+  parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
+  parser.add_argument('-if', '--in_files_prefix', metavar='', nargs=1, default=[''])
+  parser.add_argument('-id', '--in_datasets_prefix', metavar='selected_', nargs=1, default=['selected_'])
+  parser.add_argument('-ik', '--in_disk_prefix', metavar='', nargs=1, default=[''])
+  parser.add_argument('-s', '--sql_search', metavar="''", nargs=1, default=[''])
 
   args = vars(parser.parse_args())
-  argparse_helper.initialize_arguments(args, list_args=['data_tiers','mc_data'])
+  argparse_helper.initialize_arguments(args, list_args=['mc_data_sig'])
   valid, log = are_arguments_valid(args)
   if not valid:
     print('[Error] '+log)
@@ -298,10 +361,7 @@ if __name__ == '__main__':
   #data_tiers = ['nanoaod', 'miniaod']
   data_tiers = ['nanoaod']
 
-  mc_dataset_files_info_filename = './jsons/mc_dataset_files_info.json'
-  data_dataset_files_info_filename = './jsons/data_dataset_files_info.json'
-
-  meta_folder = './meta'
+  meta_folder = args['meta_folder']
   mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
   mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
   mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
@@ -309,28 +369,41 @@ if __name__ == '__main__':
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
   data_tag_meta_filename = meta_folder+'/data_tag_meta'
 
-  mc_datasets_filename = './jsons/selected_mc_datasets.json'
-  data_datasets_filename = './jsons/selected_data_datasets.json'
+  mc_dataset_files_info_filename = os.path.join(args['in_json_folder'], args['in_files_prefix']+'mc_dataset_files_info.json')
+  data_dataset_files_info_filename = os.path.join(args['in_json_folder'], args['in_files_prefix']+'data_dataset_files_info.json')
+
+  mc_datasets_filename = os.path.join(args['in_json_folder'], args['in_datasets_prefix']+'mc_datasets.json')
+  data_datasets_filename = os.path.join(args['in_json_folder'], args['in_datasets_prefix']+'data_datasets.json')
   #mc_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'mc_datasets.json')
 
+  mc_disk_files_filename = os.path.join(args['in_json_folder'], args['in_disk_prefix']+'mc_disk_files.json')
+
   #data_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'data_datasets.json')
-
-  do_mc = True
+  do_mc = False
+  if 'mc' in args['mc_data_sig']: do_mc = True
   do_data = False
+  if 'data' in args['mc_data_sig']: do_data = True
+  do_signal = False
+  if ('data' not in args['mc_data_sig']) and ('mc' not in args['mc_data_sig']): do_signal = True
 
+  dataset_files_info_filename = ''
+  mid_folder = ''
   #search_term = ""
-  search_term = "files<10"
-  sql_search_term = '' if search_term == '' else 'WHERE '+search_term
+  #search_term = "files<10"
+  search_term = args['sql_search']
 
   database = sqlite3.connect(':memory:')
   cursor = database.cursor()
 
-  if do_mc:
+  files_to_download = []
+  files_to_remove = []
+
+  if do_mc or do_signal:
+    dataset_files_info_filename = mc_dataset_files_info_filename
     # Make database
     # Load files
     # datasets_files_info[dataset][filename] = {'number_events':int, 'check_sum':int, 'modification_date':int, 'file_size':int}
     mc_dataset_files_info = nested_dict.load_json_file(mc_dataset_files_info_filename)
-    data_dataset_files_info = nested_dict.load_json_file(data_dataset_files_info_filename)
 
     # mc_dataset_names[year] = [(mc_dataset_name, mc_dir)]
     mc_dataset_names = datasets.parse_multiple_mc_dataset_names([
@@ -355,40 +428,62 @@ if __name__ == '__main__':
     fill_mc_children_database(cursor, mc_datasets)
     fill_mc_parent_database(cursor, mc_datasets)
 
-    # Search database
-    #print_mc_database(cursor)
-    mc_files = []
-    try:
-      cursor.execute('SELECT filename, mc_files.path AS path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path '+sql_search_term+';')
-      #print(cursor.fetchall())
-      mc_files = [x[0] for x in cursor.fetchall()]
-    except sqlite3.OperationalError:
-      pass
-    #print(mc_files)
-
-    ##base_dir = '/mnt/hadoop/pico'
-    #base_dir = './test'
-    #mc_disk_files_filename = './jsons/mc_disk_files.json'
-    ## mc_disk_files[nanoaod_tag][year][mc_dir][filename] = {'file_events': int}
-    #mc_disk_files = make_mc_disk_files(base_dir)
-    #nested_dict.save_json_file(mc_disk_files, mc_disk_files_filename)
-    ### Make file_mc_database
-    ##make_mc_disk_database(cursor)
-    ##base_dir = '/mnt/hadoop/pico'
-    ###base_dir = './test'
-    ##fill_nano_mc_disk_database(base_dir, cursor)
-    ##print_mc_disk_database(cursor)
+    ## Search database
+    ##print_mc_database(cursor)
+    #mc_files = []
+    #try:
+    #  cursor.execute('SELECT filename, mc_files.path AS path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path '+sql_search_term+';')
+    #  #print(cursor.fetchall())
+    #  mc_files = [x[0] for x in cursor.fetchall()]
+    #except sqlite3.OperationalError:
+    #  pass
 
     # Make file_mc_database
-    mc_disk_files_filename = './jsons/mc_disk_files.json'
     # mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
-    mc_disk_files = nested_dict.load_json_file(mc_disk_files_filename)
     make_mc_disk_database(cursor)
-    fill_mc_disk_database(cursor, mc_disk_files)
-    print_mc_disk_database(cursor)
+    if os.path.isfile(mc_disk_files_filename):
+      mc_disk_files = nested_dict.load_json_file(mc_disk_files_filename)
+      fill_mc_disk_database(cursor, mc_disk_files)
+      #print_mc_disk_database(cursor)
+
+    # Find files to download
+    #cursor.execute('SELECT filename, file_events FROM mc_files '+sql_search_term+';')
+    sql_search_term = 'WHERE mc_dir = "'+args['mc_data_sig'][0]+'"'
+    sql_search_term += ' '+search_term
+    cursor.execute('SELECT filename, mc_files.path AS path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir, mc_tags.year_tag AS year_tag, mc_tags.miniaod_tag AS miniaod_tag, mc_tags.nanoaod_tag AS nanoaod_tag FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path INNER JOIN mc_tags ON mc_tags.year = mc_datasets.year  '+sql_search_term+';')
+    target_file_info = {}
+    for file_info in cursor.fetchall():
+      filename = file_info[0]
+      file_events = file_info[2]
+      year = file_info[5]
+      nanoaod_tag = file_info[14]
+      if mid_folder == "": mid_folder = nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]
+      else: 
+        if mid_folder != nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]:
+          print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0])
+         
+      target_file_info[filename] = file_events, mid_folder
+    #print(target_file_info)
+    cursor.execute('SELECT filename, file_events FROM mc_disk;')
+    disk_file_info = {}
+    for filename, file_events in cursor.fetchall():
+      disk_file_info[filename] = file_events
+    #print(disk_file_info)
+    for filename in target_file_info:
+      if filename not in disk_file_info: files_to_download.append(filename)
+      else:
+        if target_file_info[filename][0] != disk_file_info[filename]:
+          print('Events for '+filename+' is different. target:'+target_file_info[filename]+ ' disk:'+disk_file_info[filename]+'. Adding to download list and remove list.')
+          mid_folder = target_file_info[filename][1]
+          files_to_download.append((filename, mid_folder))
+          files_to_remove.append(filename)
+    #print('files_to_download',str(files_to_download))
+    #print('files_to_remove', str(files_to_remove))
 
   if do_data:
+    dataset_files_info_filename = data_dataset_files_info_filename
     # Make database
+    data_dataset_files_info = nested_dict.load_json_file(data_dataset_files_info_filename)
     # data_tag_meta[year][run_group][streams][data_tier] = reco_tag
     data_tag_meta = datasets.parse_data_tag_meta(data_tag_meta_filename)
     # keys_data_datasets = [ [stream, year, run_group, data_tier, search_string] ]
@@ -404,19 +499,36 @@ if __name__ == '__main__':
     fill_data_children_database(cursor, data_datasets)
     fill_data_parent_database(cursor, data_datasets)
 
-    # Search database
-    #print_data_database(cursor)
-    data_files = []
-    try:
-      cursor.execute('SELECT filename, data_files.path AS path, file_events, file_size, data_datasets.stream AS stream, data_datasets.year AS year, data_datasets.run_group AS run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis as lumis FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path '+sql_search_term+';')
-      #print(cursor.fetchall())
-      data_files = [x[0] for x in cursor.fetchall()]
-    except sqlite3.OperationalError:
-      pass
-    print(data_files)
+    ## Search database
+    ##print_data_database(cursor)
+    #data_files = []
+    #try:
+    #  cursor.execute('SELECT filename, data_files.path AS path, file_events, file_size, data_datasets.stream AS stream, data_datasets.year AS year, data_datasets.run_group AS run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis as lumis FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path '+sql_search_term+';')
+    #  #print(cursor.fetchall())
+    #  data_files = [x[0] for x in cursor.fetchall()]
+    #except sqlite3.OperationalError:
+    #  pass
+    ##print(data_files)
 
+    # TODO Do disk comparison for target files
+    # Make file_data_database
+    # Find files to download
+    sql_search_term = '' if search_term == '' else 'WHERE '+search_term
+    cursor.execute('SELECT filename, data_files.path AS path, file_events, file_size, data_datasets.stream AS stream, data_datasets.year AS year, data_datasets.run_group AS run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis as lumis FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path '+sql_search_term+';')
+    #cursor.execute('SELECT filename, file_events FROM data_files;')
+    target_file_info = {}
+    for file_info in cursor.fetchall():
+      filename = file_info[0]
+      file_events = file_info[2]
+      target_file_info[filename] = file_events
+    for filename in target_file_info:
+      files_to_download.append(filename)
 
-  sys.exit()
+  # Make script for downloading
+  target_folder = os.path.join(args['target_base'], mid_folder)
+  if not os.path.exists(target_folder):
+    make_dir = ask.ask_key('Should directory:'+target_folder+' be made? (y/n) Default is y.', ['y','n'], 'n')
+    if make_dir == 'y': os.makedirs(target_folder)
 
   command_list_filename = args['out_command_lines']
 
@@ -425,14 +537,20 @@ if __name__ == '__main__':
   command_list_string += '#!/bin/env python\n'
   #command_list_string += "base_command = './run_scripts/copy_aods.py'\n"
   command_list_string += "base_command = '"+os.environ['JB_DATASETS_DIR']+"/bin/copy_aods.py'\n"
-  command_list_string += "base_folder = '"+args['target_directory']+"'\n"
-  command_list_string += "mid_folder = ''\n"
+  command_list_string += "base_folder = '"+args['target_base']+"/'\n"
+  command_list_string += "mid_folder = '"+mid_folder+"'\n"
   command_list_string += "print('# [global_key] dataset_files_info_filename : "+dataset_files_info_filename+"')\n"
 
 
-  for dataset in dataset_files_info:
-    for filename in dataset_files_info[dataset]:
-      command_list_string += "print(base_command+' "+filename+" '+base_folder+mid_folder)\n"
+  #for dataset in dataset_files_info:
+  #  for filename in dataset_files_info[dataset]:
+  #    command_list_string += "print(base_command+' "+filename+" '+base_folder+mid_folder)\n"
+  for filename in files_to_download:
+    command_list_string += "print(base_command+' "+filename+" '+base_folder+mid_folder)\n"
+
+  if len(files_to_remove) != 0:
+    print('These files should be removed: '+str(files_to_remove))
+
 
   with open(command_list_filename,'w') as command_list_file:
     command_list_file.write(command_list_string)

@@ -251,7 +251,7 @@ if __name__ == '__main__':
   parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc,data'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-ip', '--in_json_prefix', metavar='selected_', nargs=1, default=['selected_'])
-  parser.add_argument('-is', '--in_mc_multiple_selection_json', metavar='mc_multiple_selection.json', nargs=1, default=['mc_multiple_selection.json'])
+  #parser.add_argument('-is', '--in_mc_multiple_selection_json', metavar='mc_multiple_selection.json', nargs=1, default=['mc_multiple_selection.json'])
   parser.add_argument('-o', '--out_results_folder', metavar='./results', nargs=1, default=['./results'])
   parser.add_argument('-op', '--out_results_prefix', metavar="''", nargs=1, default=[''])
 
