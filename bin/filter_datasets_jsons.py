@@ -363,6 +363,7 @@ if __name__ == '__main__':
     datasets.check_overlapping_paths_data_datasets(data_datasets)
 
     #print_multiple_data_datasets(data_datasets)
+    # keys_data_datasets = [ [stream, year, run_group, data_tier, search_string] ]
     keys_data_datasets = datasets.get_keys_data_datasets(data_tag_meta, data_tiers)
     #nested_dict.remove_key_nested_dict(data_datasets, '/SingleElectron/Run2017C-31Mar2018-v1/MINIAOD')
     datasets.print_missing_data_datasets(keys_data_datasets, data_datasets)

@@ -276,7 +276,7 @@ if __name__ == '__main__':
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
   data_tag_meta_filename = meta_folder+'/data_tag_meta'
 
-  mc_multiple_selection_filename = os.path.join(args['in_json_folder'], args['in_mc_multiple_selection_json'])
+  #mc_multiple_selection_filename = os.path.join(args['in_json_folder'], args['in_mc_multiple_selection_json'])
 
   mc_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'mc_datasets.json')
   #bad_pu_mc_datasets_filename = os.path.join(args['in_json_folder'], args['in_json_prefix']+'bad_pu_mc_datasets.json')
@@ -313,10 +313,12 @@ if __name__ == '__main__':
   if make_data_datasets:
     # Ex) data_tag_meta[2016][B][MET] = 17Jul2018
     data_tag_meta = datasets.parse_data_tag_meta(data_tag_meta_filename)
+    # keys_data_datasets = [ [stream, year, run_group, data_tier, search_string] ]
     keys_data_datasets = datasets.get_keys_data_datasets(data_tag_meta, data_tiers)
 
   if make_mc_datasets:
     # Make meta
+    # keys_mc_datasets = [ [mc_dataset_name, year, data_tier, search_string] ]
     keys_mc_datasets = datasets.get_keys_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers)
 
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}

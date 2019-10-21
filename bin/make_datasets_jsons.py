@@ -115,7 +115,7 @@ if __name__ == '__main__':
     mc_tag_meta = datasets.parse_mc_tag_meta(mc_tag_meta_filename)
 
   if make_data_datasets:
-    # Ex) data_tag_meta[2016][B][MET][miniaod] = 17Jul2018
+    # data_tag_meta[year][run_group][streams][data_tier] = reco_tag
     data_tag_meta = datasets.parse_data_tag_meta(data_tag_meta_filename)
 
 
