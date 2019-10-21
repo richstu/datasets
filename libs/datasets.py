@@ -962,19 +962,27 @@ def get_path_to_keys_dataset_files_info(dataset_files_info):
 #      return False
 #  return False
 
-# parsed_mc_filename: ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__37FA68CC-B841-7D41-994C-645CFA4BA227.root
+# parsed_mc_filename: WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__120000__222071C0-CF04-1E4B-B65E-49D18B91DE8B.root
 # mc_filename: /store/mc/RunIISummer16NanoAODv5/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/120000/222071C0-CF04-1E4B-B65E-49D18B91DE8B.root
-def mc_filename_to_parsed(mc_filename):
-  input_split = mc_filename.split('/')
+def filename_to_parsed(filename):
+  input_split = filename.split('/')
   output_path = input_split[4]+'__'+input_split[3]+'__'+input_split[6]+'__'+input_split[7]+'__'+input_split[8]
   return output_path
 
 # parsed_mc_filename: ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__37FA68CC-B841-7D41-994C-645CFA4BA227.root
 # mc_filename: /store/mc/RunIISummer16NanoAODv5/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/120000/222071C0-CF04-1E4B-B65E-49D18B91DE8B.root
-def parsed_to_mc_filename(parsed_mc_filename):
-  parsed_mc_filename_split = parsed_mc_filename.split('__')
-  mc_filename = '/store/mc/'+parsed_mc_filename_split[1]+'/'+parsed_mc_filename_split[0]+'/NANOAODSIM/'+parsed_mc_filename_split[2]+'/'+parsed_mc_filename_split[3]+'/'+parsed_mc_filename_split[4]
-  return mc_filename
+def parsed_to_mc_filename(parsed_filename):
+  parsed_filename_split = parsed_filename.split('__')
+  filename = '/store/mc/'+parsed_filename_split[1]+'/'+parsed_filename_split[0]+'/NANOAODSIM/'+parsed_filename_split[2]+'/'+parsed_filename_split[3]+'/'+parsed_filename_split[4]
+  return filename
+
+# parsed_mc_filename: ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8__RunIISummer16NanoAODv5__PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1__250000__37FA68CC-B841-7D41-994C-645CFA4BA227.root
+# mc_filename: /store/mc/RunIISummer16NanoAODv5/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/120000/222071C0-CF04-1E4B-B65E-49D18B91DE8B.root
+def parsed_to_data_filename(parsed_filename):
+  parsed_filename_split = parsed_filename.split('__')
+  filename = '/store/data/'+parsed_filename_split[1]+'/'+parsed_filename_split[0]+'/NANOAODSIM/'+parsed_filename_split[2]+'/'+parsed_filename_split[3]+'/'+parsed_filename_split[4]
+  return filename
+
 
 if __name__ == '__main__':
   datasets = {'test':{'somthing':1}, 'none':{'hello':{},'bye':{}}}
