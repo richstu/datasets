@@ -469,8 +469,11 @@ if __name__ == '__main__':
     # Find files to download
     #cursor.execute('SELECT filename, file_events FROM mc_files '+sql_search_term+';')
     sql_search_term = 'WHERE mc_dir = "'+args['mc_data_sig'][0]+'"'
-    sql_search_term += ' '+search_term
-    cursor.execute('SELECT filename, mc_files.path AS path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir, mc_tags.year_tag AS year_tag, mc_tags.miniaod_tag AS miniaod_tag, mc_tags.nanoaod_tag AS nanoaod_tag FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path INNER JOIN mc_tags ON mc_tags.year = mc_datasets.year  '+sql_search_term+';')
+    if search_term != '':
+      sql_search_term += ' AND '+search_term
+    #cursor.execute('SELECT filename, mc_files.path AS path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir, mc_tags.year_tag AS year_tag, mc_tags.miniaod_tag AS miniaod_tag, mc_tags.nanoaod_tag AS nanoaod_tag FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path INNER JOIN mc_tags ON mc_tags.year = mc_datasets.year  '+sql_search_term+';')
+    cursor.execute('SELECT filename, mc_files.path AS dataset_path, file_events, file_size, mc_datasets.mc_dataset_name AS mc_dataset_name, mc_datasets.year AS dataset_year, mc_datasets.data_tier AS data_tier, mc_datasets.size AS size, mc_datasets.files AS files, mc_datasets.events AS events, mc_datasets.lumis AS lumis, mc_datasets.mc_dir AS mc_dir, mc_tags.year_tag AS year_tag, mc_tags.miniaod_tag AS miniaod_tag, mc_tags.nanoaod_tag AS nanoaod_tag FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path INNER JOIN mc_tags ON mc_tags.year = mc_datasets.year  '+sql_search_term+';')
+    #cursor.execute('SELECT filename, mc_files.path, file_events, file_size, mc_datasets.mc_dataset_name, mc_datasets.year, mc_datasets.data_tier, mc_datasets.size, mc_datasets.files, mc_datasets.events, mc_datasets.lumis, mc_datasets.mc_dir, mc_tags.year_tag, mc_tags.miniaod_tag, mc_tags.nanoaod_tag FROM mc_files INNER JOIN mc_datasets ON mc_datasets.path = mc_files.path INNER JOIN mc_tags ON mc_tags.year = mc_datasets.year  '+sql_search_term+';')
     # target_file_info[filename] = (file_events, mid_folder)
     target_file_info = {}
     for file_info in cursor.fetchall():
@@ -541,7 +544,7 @@ if __name__ == '__main__':
 
     # Find files to download
     sql_search_term = '' if search_term == '' else 'WHERE '+search_term
-    cursor.execute('SELECT filename, data_files.path AS path, file_events, file_size, data_datasets.stream AS stream, data_datasets.year AS year, data_datasets.run_group AS run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis AS lumis, data_tags.miniaod_tag AS miniaod_tag, data_tags.nanoaod_tag AS nanoaod_tag, data_tags.nanoaodsim_tag AS nanoaodsim_tag FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path INNER JOIN data_tags ON data_tags.year = data_datasets.year AND data_tags.run_group = data_datasets.run_group AND data_tags.stream = data_datasets.stream '+sql_search_term+';')
+    cursor.execute('SELECT filename, data_files.path AS dataset_path, file_events, file_size, data_datasets.stream AS dataset_stream, data_datasets.year AS dataset_year, data_datasets.run_group AS dataset_run_group, data_datasets.data_tier AS data_tier, data_datasets.size AS size, data_datasets.files AS files, data_datasets.events AS events, data_datasets.lumis AS lumis, data_tags.miniaod_tag AS miniaod_tag, data_tags.nanoaod_tag AS nanoaod_tag, data_tags.nanoaodsim_tag AS nanoaodsim_tag FROM data_files INNER JOIN data_datasets ON data_datasets.path = data_files.path INNER JOIN data_tags ON data_tags.year = data_datasets.year AND data_tags.run_group = data_datasets.run_group AND data_tags.stream = data_datasets.stream '+sql_search_term+';')
     #cursor.execute('SELECT filename, file_events FROM data_files;')
     target_file_info = {}
     for file_info in cursor.fetchall():
@@ -561,7 +564,6 @@ if __name__ == '__main__':
     disk_file_info = {}
     for filename, file_events in cursor.fetchall():
       disk_file_info[filename] = file_events
-
 
   # Make list of files to download
   for filename in target_file_info:
