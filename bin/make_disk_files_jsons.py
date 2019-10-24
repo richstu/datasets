@@ -123,9 +123,9 @@ def fill_disk_files(disk_files, data_tier, filename, year, nanoaod_tag, file_eve
 def make_mc_disk_files(base_folder):
   # Fill nanoaod info
   # TODO: Need to fix zgamma
-  #mc_files = glob.glob(base_folder+'/*/Nano/*/[!data]*/*.root')
+  #mc_files = glob.glob(base_folder+'/*/nano/*/[!data]*/*.root')
   print('Finding all files for nanoaod')
-  mc_disk_filenames = glob.glob(base_folder+'/*/Nano/*/mc/*.root')
+  mc_disk_filenames = glob.glob(base_folder+'/*/nano/*/mc/*.root')
   mc_disk_files = {}
   for mc_disk_filename in mc_disk_filenames:
     print('Processing '+mc_disk_filename)
@@ -138,7 +138,7 @@ def make_mc_disk_files(base_folder):
 # data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
 def make_data_disk_files(base_folder):
   # Fill nanoaod info
-  data_disk_filenames = glob.glob(base_folder+'/*/Nano/*/data/*.root')
+  data_disk_filenames = glob.glob(base_folder+'/*/nano/*/data/*.root')
   data_disk_files = {}
   for data_disk_filename in data_disk_filenames:
     print('Processing '+data_disk_filename)

@@ -481,10 +481,10 @@ if __name__ == '__main__':
       year = file_info[5]
       nanoaod_tag = file_info[14]
       target_file_info[filename] = file_events
-      if mid_folder == "": mid_folder = nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]
+      if mid_folder == "": mid_folder = nanoaod_tag+'/nano/'+str(year)+'/'+args['mc_data_sig'][0]
       else: 
-        if mid_folder != nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]:
-          print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0])
+        if mid_folder != nanoaod_tag+'/nano/'+str(year)+'/'+args['mc_data_sig'][0]:
+          print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/nano/'+str(year)+'/'+args['mc_data_sig'][0])
     #print(target_file_info)
 
     # Find existing files
@@ -554,10 +554,10 @@ if __name__ == '__main__':
       year = file_info[5]
       nanoaod_tag = file_info[14]
       target_file_info[filename] = file_events
-      if mid_folder == "": mid_folder = nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]
+      if mid_folder == "": mid_folder = nanoaod_tag+'/nano/'+str(year)+'/'+args['mc_data_sig'][0]
       else: 
-        if mid_folder != nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0]:
-          print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/Nano/'+str(year)+'/'+args['mc_data_sig'][0])
+        if mid_folder != nanoaod_tag+'/nano/'+str(year)+'/'+args['mc_data_sig'][0]:
+          print('mid_folder: '+mid_folder+' is different with '+nanoaod_tag+'/nano/'+str(year)+'/'+args['mc_data_sig'][0])
     #print(target_file_info)
 
     # Find existing files

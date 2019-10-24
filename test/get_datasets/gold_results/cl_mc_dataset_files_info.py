@@ -1,5 +1,5 @@
 #!/bin/env python
-base_command = '/net/gaugino/data1/jbkim/analysis/copyDataset.github/modules/datasets/bin/copy_aods.py'
+base_command = '/net/gaugino/data1/jbkim/analysis/copydataset/modules/datasets/bin/copy_aods.py'
 base_folder = './files/'
 mid_folder = 'NanoAODv5/Nano/2016/mc'
 print('# [global_key] dataset_files_info_filename : ./jsons/mc_dataset_files_info.json')
@@ -10,6 +10,7 @@ print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_Tun
 print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/120000/E5BCC7E5-06AB-A444-8DCF-904164C1ABB0.root '+base_folder+mid_folder)
 print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/100000/5108B728-ECEB-4B4A-91DD-02666B6E709F.root '+base_folder+mid_folder)
 print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/100000/A245182C-C44E-454E-82D1-3930EFAE9190.root '+base_folder+mid_folder)
+print(base_command+' /store/mc/RunIISummer16NanoAODv5/WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7-v1/120000/7EC09E9F-A061-6D46-83DB-E91A8479CD7A.root '+base_folder+mid_folder)
 print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/110000/874D4D86-29ED-3649-9760-39D35E10D02A.root '+base_folder+mid_folder)
 print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/120000/798B14FD-E105-4A48-AA86-C6EFB4A70C47.root '+base_folder+mid_folder)
 print(base_command+' /store/mc/RunIISummer16NanoAODv5/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/NANOAODSIM/PUMoriond17_Nano1June2019_102X_mcRun2_asymptotic_v7_ext1-v1/110000/4D08F99D-34EB-6842-8B33-9F985FDBDE0F.root '+base_folder+mid_folder)

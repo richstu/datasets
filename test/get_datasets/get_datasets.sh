@@ -3,11 +3,11 @@ rm -rf results
 rm -rf updated_results
 rm -rf updated_jsons
 rm -rf files
-#mkdir jsons
-#mkdir results
-#mkdir updated_jsons
-#mkdir updated_results
-#mkdir files
+mkdir jsons
+mkdir results
+mkdir updated_jsons
+mkdir updated_results
+mkdir files
 
 make_datasets_jsons.py
 filter_datasets_jsons.py
@@ -34,9 +34,10 @@ convert_dataset_files_to_cl.py data ./files ./updated_results/cl_data_dataset_fi
 convert_dataset_files_to_cl.py zjets ./files ./updated_results/cl_zjets_dataset_files_info.py -m updated_meta -i updated_jsons -if updated_
 
 # Compare results
-diff <(./results/cl_mc_dataset_files_info.py | sort) <(./gold_results/cl_mc_dataset_files_info.py|sort)
-diff <(./results/cl_data_dataset_files_info.py | sort) <(./gold_results/cl_data_dataset_files_info.py|sort)
+echo "Comparing results"
+diff <(./results/cl_mc_dataset_files_info.py | cut -d' ' -f2 | sort) <(./gold_results/cl_mc_dataset_files_info.py | cut -d' ' -f2 |sort)
+diff <(./results/cl_data_dataset_files_info.py | cut -d' ' -f2 | sort) <(./gold_results/cl_data_dataset_files_info.py | cut -d' ' -f2 |sort)
 
-diff <(./updated_results/cl_mc_dataset_files_info.py | sort) <(./gold_results/cl_updated_mc_dataset_files_info.py|sort)
-diff <(./updated_results/cl_data_dataset_files_info.py | sort) <(./gold_results/cl_updated_data_dataset_files_info.py|sort)
-diff <(./updated_results/cl_zjets_dataset_files_info.py | sort) <(./gold_results/cl_zjets_dataset_files_info.py|sort)
+diff <(./updated_results/cl_mc_dataset_files_info.py | cut -d' ' -f2 | sort) <(./gold_results/cl_updated_mc_dataset_files_info.py | cut -d' ' -f2 |sort)
+diff <(./updated_results/cl_data_dataset_files_info.py | cut -d' ' -f2 | sort) <(./gold_results/cl_updated_data_dataset_files_info.py | cut -d' ' -f2 |sort)
+diff <(./updated_results/cl_zjets_dataset_files_info.py | cut -d' ' -f2 | sort) <(./gold_results/cl_zjets_dataset_files_info.py | cut -d' ' -f2 |sort)
