@@ -365,7 +365,7 @@ def get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, mc_d
       out_info_path += prefix+'  No matching miniaod.'
 
   out_info_path += prefix + '  creation_time: '+str(datasets.convert_timestamp(path_info['creation_time']))+'\n'
-  out_info_path += prefix + '  number_events: '+str(path_info['number_events'])+'\n'
+  out_info_path += prefix + '  number_events: '+"{:,}".format(path_info['number_events'])+'\n'
   out_info_path += prefix + '  parent_chain:\n'
   parent_prefix = '    '
   for parent in path_info['parent_chain']:

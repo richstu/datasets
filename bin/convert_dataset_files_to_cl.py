@@ -437,8 +437,6 @@ if __name__ == '__main__':
     #print ('dataset_names:', mc_dataset_names)
     # Ex) tag_meta[2016] = RunIISummer16, MiniAODv3, NanoAODv5
     mc_tag_meta = datasets.parse_mc_tag_meta(mc_tag_meta_filename)
-    # keys_mc_datasets = [ [mc_dataset_name, year, data_tier, search_string] ]
-    keys_mc_datasets = datasets.get_keys_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers)
 
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
     mc_datasets = nested_dict.load_json_file(mc_datasets_filename)
@@ -511,8 +509,6 @@ if __name__ == '__main__':
     data_dataset_files_info = nested_dict.load_json_file(data_dataset_files_info_filename)
     # data_tag_meta[year][run_group][streams][data_tier] = reco_tag
     data_tag_meta = datasets.parse_data_tag_meta(data_tag_meta_filename)
-    # keys_data_datasets = [ [stream, year, run_group, data_tier, search_string] ]
-    keys_data_datasets = datasets.get_keys_data_datasets(data_tag_meta, data_tiers)
 
     # data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
     data_datasets = nested_dict.load_json_file(data_datasets_filename)
