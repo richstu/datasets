@@ -85,6 +85,8 @@ if __name__ == "__main__":
   else:
     if '[3010] Permission denied' in job_log_string:
       print('[For queue_system] to_submit: Permission denined')
+    elif '[3011] No servers are available to read the file' in job_log_string:
+      print('[For queue_system] to_submit: No servers are available')
     else:
       if 'error' not in job_log_string.lower():
         #print('[For queue_system] success')

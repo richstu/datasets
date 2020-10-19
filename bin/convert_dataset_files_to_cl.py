@@ -105,7 +105,7 @@ def make_data_database_tables(cursor):
   #cursor.execute('SELECT * FROM data_tags')
   cursor.execute('CREATE TABLE data_children(child_path text PRIMARY KEY, path text NOT NULL);')
   #cursor.execute('SELECT * FROM data_children')
-  cursor.execute('CREATE TABLE data_parent(parent_path text PRIMARY KEY, path text NOT NULL);')
+  cursor.execute('CREATE TABLE data_parent(id integer PRIMARY KEY, parent_path text NOT NULL, path text NOT NULL);')
   #cursor.execute('SELECT * FROM data_parent')
   #print([description[0] for description in cursor.description])
 
@@ -254,6 +254,7 @@ def fill_data_children_database(cursor, data_datasets):
 
 # data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
 def fill_data_parent_database(cursor, data_datasets):
+  index = -1
   for stream in data_datasets:
     for year in data_datasets[stream]:
       for run_group in data_datasets[stream][year]:
@@ -261,6 +262,7 @@ def fill_data_parent_database(cursor, data_datasets):
           for path in data_datasets[stream][year][run_group][data_tier]:
             previous_path = path
             for parent_path in data_datasets[stream][year][run_group][data_tier][path]['parent_chain']:
+              index += 1
               cursor.execute('INSERT INTO data_parent (parent_path, path) VALUES (?, ?)',(parent_path, previous_path))
               previous_path = parent_path
 

@@ -291,6 +291,7 @@ def get_keys_from_data_datasets(data_datasets, data_tag_meta, data_tiers):
       for run_group in data_datasets[stream][year]:
         for data_tier in data_datasets[stream][year][run_group]:
           data_dataset_search_string = get_data_dataset_search_string(data_tag_meta, stream, year, run_group, data_tier)
+          print(data_dataset_search_string)
           keys_from_data_datasets.append([stream, year, run_group, data_tier, data_dataset_search_string])
   return keys_from_data_datasets
 
@@ -329,10 +330,12 @@ def update_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers, original_mc_da
 def update_data_datasets(data_tag_meta, data_tiers, original_data_datasets):
   keys_data_datasets = get_keys_data_datasets(data_tag_meta, data_tiers)
   keys_from_data_datasets = get_keys_from_data_datasets(original_data_datasets, data_tag_meta, data_tiers)
-  #print('meta', keys_data_datasets)
-  #print('json', keys_from_data_datasets)
+  print('meta', keys_data_datasets)
+  print('json', keys_from_data_datasets)
   append_keys_data_datasets = subtract_keys_datasets(keys_data_datasets, keys_from_data_datasets)
   remove_keys_data_datasets = subtract_keys_datasets(keys_from_data_datasets, keys_data_datasets)
+  print('append', append_keys_data_datasets)
+  print('remove', remove_keys_data_datasets)
 
   append_data_datasets_list = get_data_datasets_list(append_keys_data_datasets)
   append_data_datasets = convert_list_to_data_datasets(append_data_datasets_list)

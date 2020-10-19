@@ -323,8 +323,7 @@ if __name__ == '__main__':
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP5Up')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'CUETP8M1Up')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'CUETP8M1Down')
-    # Reject signal tune
-    filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
+    #filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'DoubleScattering')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, '14TeV')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'FlatPU')
@@ -336,6 +335,12 @@ if __name__ == '__main__':
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'UpPS')
     #datasets.print_path_mc_datasets(datasets.subtract_mc_datasets(mc_datasets, filtered_mc_datasets))
     #datasets.print_missing_mc_datasets(keys_mc_datasets, mc_datasets)
+
+    # Reject signal tune
+    filtered_mc_datasets = filter_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
+    signal_tune_mc_datasets = get_unrejected_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
+    print('Using signal TuneCP2 for below, because no other datasets')
+    datasets.print_path_mc_datasets(signal_tune_mc_datasets)
 
     filtered_mc_datasets = filter_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'PSweights')
     bad_ps_weights_mc_datasets = get_unrejected_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'PSweights')
