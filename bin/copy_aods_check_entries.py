@@ -100,6 +100,12 @@ if __name__ == "__main__":
       print('[For queue_system] to_submit: No servers are available')
     elif '[3010] XrdXrootdAio: Unable to read' in job_log_string:
       print('[For queue_system] to_submit: [301] Unable to read')
+    elif '[FATAL] Connection error' in job_log_string:
+      print('[For queue_system] to_submit: [FATAL] Connection error')
+    elif '[3006] tried hosts option not supported' in job_log_string:
+      print('[For queue_system] to_submit: [3006] tried hosts option not supported')
+    elif '[3007] Input/output error' in job_log_string:
+      print('[For queue_system] to_submit: [3007] Input/output error')
     else:
       if 'error' not in job_log_string.lower():
         #print('[For queue_system] success')
