@@ -186,6 +186,7 @@ def fill_mc_parent_database(cursor, mc_datasets):
         for path in mc_datasets[mc_dataset_name][year][data_tier]:
           previous_path = path
           for parent_path in mc_datasets[mc_dataset_name][year][data_tier][path]['parent_chain']:
+            #print(path, parent_path, previous_path)
             cursor.execute('INSERT INTO mc_parent (parent_path, path) VALUES (?, ?)',(parent_path, previous_path))
             previous_path = parent_path
 

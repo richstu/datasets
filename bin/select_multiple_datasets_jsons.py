@@ -487,7 +487,7 @@ if __name__ == '__main__':
     # Load multiple_selection from json
     multiple_selection = get_multiple_selection(multiple_mc_datasets, data_tiers)
 
-    # Should do automatic selection for ext
+    # Should do automatic selection for ext. 
     auto_select_extension(multiple_selection, multiple_selection_from_file, multiple_selection_filename)
 
     # Show previous selections

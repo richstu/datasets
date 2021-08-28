@@ -44,6 +44,7 @@ def check_entries(job_argument_string):
     if not os.path.isfile(file_path): return '[For queue_system] fail: no file named '+file_path
 
     root_file = ROOT.TFile.Open(file_path)
+    if not root_file: return '[For queue_system] fail: Failed in opening '+file_path
     root_tree = root_file.Get('Events')
     root_number_entries = root_tree.GetEntries()
 
@@ -85,8 +86,20 @@ if __name__ == "__main__":
   else:
     if '[3010] Permission denied' in job_log_string:
       print('[For queue_system] to_submit: Permission denined')
+    elif '[3010] permission denied' in job_log_string:
+      print('[For queue_system] to_submit: Permission denined v2')
+    elif '[FATAL] Redirect limit has been reached' in job_log_string:
+      print('[For queue_system] to_submit: Redirect limit has been reached')
+    elif '[ERROR] Operation expired' in job_log_string:
+      print('[For queue_system] to_submit: Operation expired')
+    elif '[3011] No servers have read access to the file' in job_log_string:
+      print('[For queue_system] to_submit: No servers have read access to the file')
+    elif '[3010] Unable to open' in job_log_string:
+      print('[For queue_system] to_submit: Unable to open')
     elif '[3011] No servers are available to read the file' in job_log_string:
       print('[For queue_system] to_submit: No servers are available')
+    elif '[3010] XrdXrootdAio: Unable to read' in job_log_string:
+      print('[For queue_system] to_submit: [301] Unable to read')
     else:
       if 'error' not in job_log_string.lower():
         #print('[For queue_system] success')
