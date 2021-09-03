@@ -11,6 +11,7 @@ import ROOT
 import datasets
 import shlex
 import os
+import time
 
 def get_args(keys, job_argument_string):
   parser = argparse.ArgumentParser()
@@ -41,7 +42,16 @@ def check_entries(job_argument_string):
     print(args_command)
     file_path = get_file_path(args_command['output_path'], "", args_command['input_path'])
     #print(file_path)
-    if not os.path.isfile(file_path): return '[For queue_system] fail: no file named '+file_path
+    if not os.path.isfile(file_path): 
+      # Wait for file to appear on raid
+      file_exists = False
+      for iWait in range(10):
+        time.sleep(10)
+        if os.path.isfile(file_path):
+          file_exists = True
+          break
+      if not file_exists:
+        return '[For queue_system] fail: no file named '+file_path
 
     root_file = ROOT.TFile.Open(file_path)
     if not root_file: return '[For queue_system] fail: Failed in opening '+file_path
