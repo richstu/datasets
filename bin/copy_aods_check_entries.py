@@ -116,6 +116,8 @@ if __name__ == "__main__":
       print('[For queue_system] to_submit: [3006] tried hosts option not supported')
     elif '[3007] Input/output error' in job_log_string:
       print('[For queue_system] to_submit: [3007] Input/output error')
+    elif '[3006] File exists' in job_log_string:
+      print(check_entries(job_argument_string))
     else:
       if 'error' not in job_log_string.lower():
         #print('[For queue_system] success')
