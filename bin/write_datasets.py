@@ -22,7 +22,7 @@ def are_arguments_valid(args):
     return False, 'data_tier: '+str(args['data_tiers'])+' is not valid.'
 
   # Check for years
-  if not argparse_helper.is_valid(args, 'years', ['2016', '2017', '2018']):
+  if not argparse_helper.is_valid(args, 'years', ['2016', '2016APV', '2017', '2018']):
     return False, 'years: '+str(args['years'])+' is not valid.'
   
   # Will not check for mc_data_sig. Can't know what nanoaod_tag will be.
@@ -261,7 +261,7 @@ if __name__ == '__main__':
   parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
   parser.add_argument('-d', '--data_tiers', metavar='"nanoaod"', nargs=1, default=['nanoaod'])
   parser.add_argument('-t', '--mc_data_sig', metavar='""', nargs=1, default=[''])
-  parser.add_argument('-y', '--years', metavar='"2016,2017,2018"', nargs=1, default=['2016,2017,2018'])
+  parser.add_argument('-y', '--years', metavar='"2016,2016APV,2017,2018"', nargs=1, default=['2016,2016APV,2017,2018'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-ip', '--in_json_prefix', metavar='selected_', nargs=1, default=['selected_'])
   #parser.add_argument('-is', '--in_mc_multiple_selection_json', metavar='mc_multiple_selection.json', nargs=1, default=['mc_multiple_selection.json'])
@@ -284,6 +284,7 @@ if __name__ == '__main__':
 
   mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
   mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
+  mc_dataset_2016APV_names_filename = meta_folder+'/mc_dataset_2016APV_names'
   mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
   mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
@@ -314,8 +315,9 @@ if __name__ == '__main__':
   if make_mc_datasets:
     # mc_dataset_names[year] = [(mc_dataset_name, mc_dir)]
     mc_dataset_names = datasets.parse_multiple_mc_dataset_names([
-      [mc_dataset_common_names_filename, ['2016', '2017', '2018']],
+      [mc_dataset_common_names_filename, ['2016', '2016APV', '2017', '2018']],
       [mc_dataset_2016_names_filename, ['2016']],
+      [mc_dataset_2016APV_names_filename, ['2016APV']],
       [mc_dataset_2017_names_filename, ['2017']],
       [mc_dataset_2018_names_filename, ['2018']],
       ])
