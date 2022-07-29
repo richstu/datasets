@@ -133,6 +133,7 @@ if __name__ == '__main__':
   meta_folder = args['meta_folder']
   mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
   mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
+  mc_dataset_2016APV_names_filename = meta_folder+'/mc_dataset_2016APV_names'
   mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
   mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
@@ -161,8 +162,9 @@ if __name__ == '__main__':
     mc_dataset_files_info = nested_dict.load_json_file(mc_dataset_files_info_filename)
     # mc_dataset_names[year] = [(mc_dataset_name, mc_dir)]
     mc_dataset_names = datasets.parse_multiple_mc_dataset_names([
-      [mc_dataset_common_names_filename, ['2016', '2017', '2018']],
+      [mc_dataset_common_names_filename, ['2016', '2016APV', '2017', '2018']],
       [mc_dataset_2016_names_filename, ['2016']],
+      [mc_dataset_2016APV_names_filename, ['2016APV']],
       [mc_dataset_2017_names_filename, ['2017']],
       [mc_dataset_2018_names_filename, ['2018']],
       ])
