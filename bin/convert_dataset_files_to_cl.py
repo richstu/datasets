@@ -88,7 +88,7 @@ def make_mc_database_tables(cursor):
   #cursor.execute('SELECT * FROM mc_files')
   cursor.execute('CREATE TABLE mc_datasets(path text PRIMARY KEY, mc_dataset_name text NOT NULL, year integer, data_tier text NOT NULL, creation_time integer, size integer, files integer, events integer, lumis integer, mc_dir text NOT NULL);')
   #cursor.execute('SELECT * FROM mc_datasets')
-  cursor.execute('CREATE TABLE mc_tags(year integer PRIMARY KEY, year_tag text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL);')
+  cursor.execute('CREATE TABLE mc_tags(year text PRIMARY KEY, year_tag text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL);')
   #cursor.execute('SELECT * FROM mc_tags')
   cursor.execute('CREATE TABLE mc_children(child_path text PRIMARY KEY, path text NOT NULL);')
   #cursor.execute('SELECT * FROM mc_children')
