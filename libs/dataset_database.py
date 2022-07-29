@@ -2,9 +2,9 @@
 def make_mc_database_tables(cursor):
   cursor.execute('CREATE TABLE mc_files(filename text PRIMARY KEY, path text NOT NULL, file_events integer, check_sum integer, modification_date integer, file_size integer);')
   #cursor.execute('SELECT * FROM mc_files')
-  cursor.execute('CREATE TABLE mc_datasets(path text PRIMARY KEY, mc_dataset_name text NOT NULL, year integer, data_tier text NOT NULL, creation_time integer, size integer, files integer, events integer, lumis integer, mc_dir text NOT NULL);')
+  cursor.execute('CREATE TABLE mc_datasets(path text PRIMARY KEY, mc_dataset_name text NOT NULL, year text, data_tier text NOT NULL, creation_time integer, size integer, files integer, events integer, lumis integer, mc_dir text NOT NULL);')
   #cursor.execute('SELECT * FROM mc_datasets')
-  cursor.execute('CREATE TABLE mc_tags(year integer PRIMARY KEY, year_tag text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL);')
+  cursor.execute('CREATE TABLE mc_tags(year text PRIMARY KEY, year_tag text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL);')
   #cursor.execute('SELECT * FROM mc_tags')
   cursor.execute('CREATE TABLE mc_children(child_path text PRIMARY KEY, path text NOT NULL);')
   #cursor.execute('SELECT * FROM mc_children')
@@ -15,9 +15,9 @@ def make_mc_database_tables(cursor):
 def make_data_database_tables(cursor):
   cursor.execute('CREATE TABLE data_files(filename text PRIMARY KEY, path text NOT NULL, file_events integer, check_sum integer, modification_date integer, file_size integer);')
   #cursor.execute('SELECT * FROM data_files')
-  cursor.execute('CREATE TABLE data_datasets(path text PRIMARY KEY, stream text NOT NULL, year integer, run_group text NOT NULL, data_tier text NOT NULL, creation_time integer, size integer, files integer, events integer, lumis integer);')
+  cursor.execute('CREATE TABLE data_datasets(path text PRIMARY KEY, stream text NOT NULL, year text, run_group text NOT NULL, data_tier text NOT NULL, creation_time integer, size integer, files integer, events integer, lumis integer);')
   #cursor.execute('SELECT * FROM data_datasets')
-  cursor.execute('CREATE TABLE data_tags(id integer PRIMARY KEY, stream text NOT NULL, year integer, run_group text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL, nanoaodsim_tag text NOT NULL);')
+  cursor.execute('CREATE TABLE data_tags(id integer PRIMARY KEY, stream text NOT NULL, year text, run_group text NOT NULL, miniaod_tag text NOT NULL, nanoaod_tag text NOT NULL, nanoaodsim_tag text NOT NULL);')
   #cursor.execute('SELECT * FROM data_tags')
   cursor.execute('CREATE TABLE data_children(child_path text PRIMARY KEY, path text NOT NULL);')
   #cursor.execute('SELECT * FROM data_children')
