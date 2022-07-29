@@ -43,6 +43,7 @@ def parse_multiple_mc_dataset_names(mc_dataset_names_list):
 # Ex) mc_dataset_names[2016] = TTJets_SingleLeptFromT_Tune
 def parse_mc_dataset_names(mc_dataset_names_filename, years):
   mc_dataset_names = {}
+  if not os.path.isfile(mc_dataset_names_filename): return mc_dataset_names
   with open(mc_dataset_names_filename) as mc_dataset_names_file:
     for line in mc_dataset_names_file:
       if line[0]=='#': continue
@@ -155,11 +156,10 @@ def query_dataset(query_type, dataset_path, verbose=True):
 def get_parent_chain(mc_dataset_path, parent_chain):
   parent = query_dataset('parent', mc_dataset_path)
   if len(parent) == 0: return
-  elif len(parent) == 1: 
-    parent_chain.append(parent[0])
-    get_parent_chain(parent[0], parent_chain)
   else:
-    print('[Error] There are multiple parents.')
+    for parent_item in parent:
+      parent_chain.append(parent_item)
+    get_parent_chain(parent[-1], parent_chain)
 
 # meta_info = {'disk_size':int, 'number_files':int, 'number_events':int, 'number_lumis':int, 'creation_time':int}
 def make_meta_dataset(dataset_path, verbose=True):
@@ -291,7 +291,6 @@ def get_keys_from_data_datasets(data_datasets, data_tag_meta, data_tiers):
       for run_group in data_datasets[stream][year]:
         for data_tier in data_datasets[stream][year][run_group]:
           data_dataset_search_string = get_data_dataset_search_string(data_tag_meta, stream, year, run_group, data_tier)
-          print(data_dataset_search_string)
           keys_from_data_datasets.append([stream, year, run_group, data_tier, data_dataset_search_string])
   return keys_from_data_datasets
 
@@ -330,12 +329,10 @@ def update_mc_datasets(mc_dataset_names, mc_tag_meta, data_tiers, original_mc_da
 def update_data_datasets(data_tag_meta, data_tiers, original_data_datasets):
   keys_data_datasets = get_keys_data_datasets(data_tag_meta, data_tiers)
   keys_from_data_datasets = get_keys_from_data_datasets(original_data_datasets, data_tag_meta, data_tiers)
-  print('meta', keys_data_datasets)
-  print('json', keys_from_data_datasets)
+  #print('meta', keys_data_datasets)
+  #print('json', keys_from_data_datasets)
   append_keys_data_datasets = subtract_keys_datasets(keys_data_datasets, keys_from_data_datasets)
   remove_keys_data_datasets = subtract_keys_datasets(keys_from_data_datasets, keys_data_datasets)
-  print('append', append_keys_data_datasets)
-  print('remove', remove_keys_data_datasets)
 
   append_data_datasets_list = get_data_datasets_list(append_keys_data_datasets)
   append_data_datasets = convert_list_to_data_datasets(append_data_datasets_list)

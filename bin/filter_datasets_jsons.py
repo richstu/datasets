@@ -113,11 +113,13 @@ def reject_bad_pu_2017_mc_datasets(dummy_input, mc_datasets, mc_dataset_name, ye
     if data_tier == 'miniaod':
       if len(path_info['parent_chain']) < 1: return True
       parent = path_info['parent_chain'][0]
+      if 'UL17' in parent: return False
       if not 'PU2017' in parent: return True
       return False
     elif data_tier == 'nanoaod':
       if len(path_info['parent_chain']) < 2: return True
       parent_parent = path_info['parent_chain'][1]
+      if 'UL17' in parent_parent: return False
       if not 'PU2017' in parent_parent: return True
       return False
   return False
@@ -272,6 +274,7 @@ if __name__ == '__main__':
 
   mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
   mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
+  mc_dataset_2016APV_names_filename = meta_folder+'/mc_dataset_2016APV_names'
   mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
   mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
@@ -288,8 +291,9 @@ if __name__ == '__main__':
   if make_mc_datasets:
     # mc_dataset_names[year] = [(mc_dataset_name, mc_dir)]
     mc_dataset_names = datasets.parse_multiple_mc_dataset_names([
-      [mc_dataset_common_names_filename, ['2016', '2017', '2018']],
+      [mc_dataset_common_names_filename, ['2016', '2016APV', '2017', '2018']],
       [mc_dataset_2016_names_filename, ['2016']],
+      [mc_dataset_2016APV_names_filename, ['2016APV']],
       [mc_dataset_2017_names_filename, ['2017']],
       [mc_dataset_2018_names_filename, ['2018']],
       ])
@@ -323,7 +327,8 @@ if __name__ == '__main__':
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP5Up')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'CUETP8M1Up')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'CUETP8M1Down')
-    #filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
+    # Reject signal tune
+    filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'DoubleScattering')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, '14TeV')
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'FlatPU')
@@ -335,12 +340,6 @@ if __name__ == '__main__':
     filtered_mc_datasets = filter_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'UpPS')
     #datasets.print_path_mc_datasets(datasets.subtract_mc_datasets(mc_datasets, filtered_mc_datasets))
     #datasets.print_missing_mc_datasets(keys_mc_datasets, mc_datasets)
-
-    # Reject signal tune
-    filtered_mc_datasets = filter_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
-    signal_tune_mc_datasets = get_unrejected_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'TuneCP2')
-    print('Using signal TuneCP2 for below, because no other datasets')
-    datasets.print_path_mc_datasets(signal_tune_mc_datasets)
 
     filtered_mc_datasets = filter_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'PSweights')
     bad_ps_weights_mc_datasets = get_unrejected_if_possible_mc_datasets(filtered_mc_datasets, reject_string_ignore_case_mc_datasets, 'PSweights')
