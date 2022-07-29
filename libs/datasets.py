@@ -49,6 +49,7 @@ def parse_mc_dataset_names(mc_dataset_names_filename, years):
       if line[0]=='#': continue
       if '#' in line: line_clean = line.split('#')[0].rstrip()
       else: line_clean = line.rstrip()
+      if line_clean == '': continue
       line_split = line_clean.split(' ')
       if len(line_split) == 1:
         mc_dir = 'mc'
