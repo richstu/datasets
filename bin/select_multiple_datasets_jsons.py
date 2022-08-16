@@ -539,6 +539,10 @@ if __name__ == '__main__':
       datasets.print_same_parent_mc_datasets(mc_datasets_selected)
       # Save results
       nested_dict.save_json_file(mc_datasets_selected, selected_mc_datasets_filename)
+    else:
+      # Save results
+      nested_dict.save_json_file(mc_datasets, selected_mc_datasets_filename)
+      
     
 
 
