@@ -167,6 +167,7 @@ def fill_mc_tags_database(cursor, mc_tag_meta):
     year_tag = mc_tag_meta[year][0]
     miniaod_tag = mc_tag_meta[year][1]
     nanoaod_tag = mc_tag_meta[year][2]
+    nanoaod_tag = nanoaod_tag.replace('APV', '')
     cursor.execute('INSERT INTO mc_tags (year, year_tag, miniaod_tag, nanoaod_tag) VALUES (?, ?, ?, ?)',(year, year_tag, miniaod_tag, nanoaod_tag))
 
 # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
