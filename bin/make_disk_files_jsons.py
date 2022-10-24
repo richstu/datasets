@@ -49,7 +49,7 @@ def get_file_nanomc_info(base_folder, mc_disk_filename_with_base):
   mc_disk_filename = mc_disk_filename_with_base[len(base_folder)+1:]
   mc_disk_filename_split = mc_disk_filename.split('/')
   nanoaod_tag = mc_disk_filename_split[0]
-  year = int(mc_disk_filename_split[2])
+  year = mc_disk_filename_split[2]
   mc_dir = mc_disk_filename_split[3]
   parsed_mc_filename = mc_disk_filename_split[4]
   mc_filename = datasets.parsed_to_mc_filename(parsed_mc_filename)
@@ -72,7 +72,7 @@ def get_file_nanodata_info(base_folder, data_disk_filename_with_base):
   data_disk_filename = data_disk_filename_with_base[len(base_folder)+1:]
   data_disk_filename_split = data_disk_filename.split('/')
   nanoaod_tag = data_disk_filename_split[0]
-  year = int(data_disk_filename_split[2])
+  year = data_disk_filename_split[2]
   data_dir = data_disk_filename_split[3]
   parsed_data_filename = data_disk_filename_split[4]
   data_filename = datasets.parsed_to_data_filename(parsed_data_filename)
@@ -120,12 +120,13 @@ def fill_disk_files(disk_files, data_tier, filename, year, nanoaod_tag, file_eve
 
 
 # mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
-def make_mc_disk_files(base_folder):
+def make_mc_disk_files(base_folder, nanoaod_version):
   # Fill nanoaod info
   # TODO: Need to fix zgamma
   #mc_files = glob.glob(base_folder+'/*/nano/*/[!data]*/*.root')
-  print('Finding all files for nanoaod')
-  mc_disk_filenames = glob.glob(base_folder+'/*/nano/*/mc/*.root')
+  print('Finding all files for nanoaod in below path')
+  print(base_folder+'/'+nanoaod_version+'/nano/*/mc/*.root')
+  mc_disk_filenames = glob.glob(base_folder+'/'+nanoaod_version+'/nano/*/mc/*.root')
   mc_disk_files = {}
   for mc_disk_filename in mc_disk_filenames:
     print('Processing '+mc_disk_filename)
@@ -136,9 +137,11 @@ def make_mc_disk_files(base_folder):
   return mc_disk_files
 
 # data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
-def make_data_disk_files(base_folder):
+def make_data_disk_files(base_folder, nanoaod_version):
+  print('Finding all files for nanoaod in below path')
+  print(base_folder+'/'+nanoaod_version+'/nano/*/data/*.root')
   # Fill nanoaod info
-  data_disk_filenames = glob.glob(base_folder+'/*/nano/*/data/*.root')
+  data_disk_filenames = glob.glob(base_folder+'/'+nanoaod_version+'/nano/*/data/*.root')
   data_disk_files = {}
   for data_disk_filename in data_disk_filenames:
     print('Processing '+data_disk_filename)
@@ -151,8 +154,9 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Makes disk_files.jsons.')
   parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc,data'])
-  parser.add_argument('-b', '--base_folder', metavar='/mnt/hadoop/pico', nargs=1, default=['/mnt/hadoop/pico'])
+  parser.add_argument('-b', '--base_folder', metavar='/net/cms17/cms17r0/pico', nargs=1, default=['/net/cms17/cms17r0/pico'])
   parser.add_argument('-o', '--out_jsons_folder', metavar='./jsons', nargs=1, default=['./jsons'])
+  parser.add_argument('-n', '--nanoaod_version', metavar='NanoAODv9', nargs=1, default=['NanoAODv9'])
   parser.add_argument('-op', '--out_jsons_prefix', metavar="''", nargs=1, default=[''])
 
   args = vars(parser.parse_args())
@@ -173,10 +177,10 @@ if __name__ == "__main__":
 
   if do_mc:
     # mc_disk_files[data_tier][aod_tag][year][mc_dir][filename] = {'file_events': int}
-    mc_disk_files = make_mc_disk_files(base_folder)
+    mc_disk_files = make_mc_disk_files(base_folder, args['nanoaod_version'])
     nested_dict.save_json_file(mc_disk_files, mc_disk_files_filename)
 
   if do_data:
     # data_disk_files[data_tier][aod_tag][year][data_dir][filename] = {'file_events': int}
-    data_disk_files = make_data_disk_files(base_folder)
+    data_disk_files = make_data_disk_files(base_folder, args['nanoaod_version'])
     nested_dict.save_json_file(data_disk_files, data_disk_files_filename)
