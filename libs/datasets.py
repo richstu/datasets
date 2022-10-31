@@ -17,6 +17,7 @@ import multiprocessing
 import datetime
 import itertools
 import nested_dict
+import time
 
 ## mc_dataset_names = [mc_dataset]
 ## Ex) mc_dataset_names[0] = TTJets_SingleLeptFromT_Tune
@@ -149,8 +150,15 @@ def get_data_dataset_search_string_keys(data_tag_meta, keys):
   return get_data_dataset_search_string(data_tag_meta, keys[0], keys[1], keys[2], keys[3])
 
 def query_dataset(query_type, dataset_path, verbose=True):
-  if verbose: print('Query: '+query_type+' Dataset: '+dataset_path)
-  result = subprocess.check_output('dasgoclient -query="'+query_type+' dataset='+dataset_path+'"', shell=True, universal_newlines=True).split()
+  for iRetry in range(5):
+    try:
+      if verbose: print('Query: '+query_type+' Dataset: '+dataset_path)
+      result = subprocess.check_output('dasgoclient -query="'+query_type+' dataset='+dataset_path+'"', shell=True, universal_newlines=True).split()
+      break
+    except subprocess.CalledProcessError as e:
+      print(e.output)
+      print('Trying again '+str(iRetry+1)+' Query: '+query_type+' Dataset: '+dataset_path)
+      time.sleep(3)
   if verbose: print('  Result: ' + str(result))
   return result
 
@@ -164,8 +172,15 @@ def get_parent_chain(mc_dataset_path, parent_chain):
 
 # meta_info = {'disk_size':int, 'number_files':int, 'number_events':int, 'number_lumis':int, 'creation_time':int}
 def make_meta_dataset(dataset_path, verbose=True):
-  if verbose: print('Query: meta Dataset: '+dataset_path)
-  result = subprocess.check_output('dasgoclient -query="dataset='+dataset_path+'" -json', shell=True)
+  for iRetry in range(5):
+    try:
+      if verbose: print('Query: meta Dataset: '+dataset_path)
+      result = subprocess.check_output('dasgoclient -query="dataset='+dataset_path+'" -json', shell=True)
+      break
+    except subprocess.CalledProcessError as e:
+      print(e.output)
+      print('Trying again '+str(iRetry+1)+' Query: meta Dataset: '+dataset_path)
+      time.sleep(3)
   if verbose: print('  Result: ' + str(result))
   result_dict_list = json.loads(result)
   meta_info = {}

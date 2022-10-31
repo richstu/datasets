@@ -576,7 +576,7 @@ if __name__ == '__main__':
     if filename not in disk_file_info: files_to_download.append(filename)
     else:
       if target_file_info[filename] != disk_file_info[filename]:
-        print('Events for '+filename+' is different. target:'+target_file_info[filename]+ ' disk:'+disk_file_info[filename]+'. Adding to download list and remove list.')
+        print('Events for '+filename+' is different. target:'+str(target_file_info[filename])+ ' disk:'+str(disk_file_info[filename])+'. Adding to download list and remove list.')
         files_to_download.append(filename)
         files_to_remove.append(filename)
 
