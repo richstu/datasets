@@ -134,6 +134,45 @@ def auto_select_extension(multiple_selection, multiple_selection_from_file, mult
       update_selection(search_string, multiple_selection[search_string]['paths'], [0,1], 'Auto-selected for extension file.', multiple_selection_from_file)
       nested_dict.save_json_file(multiple_selection_from_file, multiple_selection_filename)
 
+def get_info_path_string_data_datasets(path, data_datasets, prefix):
+  out_info_path = ''
+  # Make meta 
+  path_to_keys_data_datasets = datasets.get_path_to_keys_data_datasets(data_datasets)
+  mini_to_nanos_from_nanoaod_data = datasets.get_mini_to_nanos_from_nanoaod_data_datasets(data_datasets)
+  nano_to_mini_from_miniaod_data = datasets.get_nano_to_mini_from_miniaod_data_datasets(data_datasets)
+
+  keys = path_to_keys_data_datasets[path]
+  keys.append(path)
+  path_info = nested_dict.get_item_nested_dict(data_datasets, keys)
+
+  # Print extra info
+  same_parent_paths_data = datasets.get_same_parent_paths_data(data_datasets)
+  if has_same_parent(same_parent_paths_data, path):
+    out_info_path += '  Has same parent\n'
+  if 'miniaod' in keys:
+    if path in mini_to_nanos_from_nanoaod_data:
+      out_info_path += prefix+'  Matching nanoaod: '+get_list_string(mini_to_nanos_from_nanoaod_data[path])+'\n'
+    else:
+      out_info_path += prefix+'  No matching nanoaod.\n'
+  if 'nanoaod' in keys:
+    if path in nano_to_mini_from_miniaod_data:
+      out_info_path += prefix+'  Matching miniaod: '+nano_to_mini_from_miniaod_data[path]+'\n'
+    else:
+      out_info_path += prefix+'  No matching miniaod.\n'
+
+  out_info_path += prefix + '  creation_time: '+str(datasets.convert_timestamp(path_info['creation_time']))+'\n'
+  out_info_path += prefix + '  parent_chain:\n'
+  parent_prefix = '    '
+  for parent in path_info['parent_chain']:
+    out_info_path += prefix + parent_prefix + parent +'\n'
+    parent_prefix += '  '
+  #if len(path_info['children']) != 0:
+  #  out_info_path += prefix + '  children:\n'
+  #  for child in path_info['children']:
+  #    out_info_path += prefix + '  ' + child+'\n'
+  #out_info_path = out_info_path.rstrip()
+  return out_info_path
+
 def get_info_path_string_mc_datasets(path, mc_datasets, prefix):
   out_info_path = ''
   # Make meta 
@@ -161,7 +200,7 @@ def get_info_path_string_mc_datasets(path, mc_datasets, prefix):
     if path in nano_to_mini_from_miniaod:
       out_info_path += prefix+'  Matching miniaod: '+nano_to_mini_from_miniaod[path]+'\n'
     else:
-      out_info_path += prefix+'  No matching miniaod.'
+      out_info_path += prefix+'  No matching miniaod.\n'
 
   out_info_path += prefix + '  creation_time: '+str(datasets.convert_timestamp(path_info['creation_time']))+'\n'
   out_info_path += prefix + '  parent_chain:\n'
@@ -175,6 +214,15 @@ def get_info_path_string_mc_datasets(path, mc_datasets, prefix):
   #    out_info_path += prefix + '  ' + child+'\n'
   #out_info_path = out_info_path.rstrip()
   return out_info_path
+
+def print_data_datasets_simple(data_datasets, keys):
+  if nested_dict.is_nested_dict(data_datasets, keys):
+    paths = nested_dict.get_item_nested_dict(data_datasets, keys)
+    for path in paths:
+      print(get_info_path_string_data_datasets(path, data_datasets, '  '))
+  else:
+    print(str(keys)+' do not exist in data_datasets')
+
 
 # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
 def print_mc_datasets_simple(mc_datasets, keys):
@@ -240,6 +288,21 @@ def print_multiple_dataset_info(search_string, multiple_selection, search_string
     else: print('  ['+str(ipath)+'] '+path)
     print(get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, multiple_mc_datasets, mini_to_nanos_from_nanoaod, nano_to_mini_from_miniaod, '  '))
 
+def print_multiple_data_dataset_info(search_string, multiple_selection_data, search_string_to_keys_data_datasets, path_to_keys_data_datasets, same_parent_paths_data, same_run_paths_data, multiple_data_datasets, mini_to_nanos_from_nanoaod_data, nano_to_mini_from_miniaod_data):
+  print('search keys: ['+ get_list_string(search_string_to_keys_data_datasets[search_string]) +'] : '+search_string)
+  print('')
+  paths = multiple_selection_data[search_string]['paths']
+  common_name = get_common_name(paths)
+  if len(common_name) != 0:
+    print('  COMMON_PATH: '+common_name)
+  print('')
+  for ipath, path in enumerate(paths):
+    print('')
+    #if len(common_name) != 0: print termcolor.colored('['+str(ipath)+'] ' + path.replace(common_name,'|COMMON_PATH|'), 'red')
+    if len(common_name) != 0: print termcolor.colored('['+str(ipath)+'] ' + path, 'red')
+    else: print('  ['+str(ipath)+'] '+path)
+    print(get_data_info_path_string(path, path_to_keys_data_datasets, same_parent_paths_data, same_run_paths_data, multiple_data_datasets, mini_to_nanos_from_nanoaod_data, nano_to_mini_from_miniaod_data, '  '))
+
 def is_number_string_good(number_string, min_num, max_num):
   if not unicode(number_string,'utf-8').isnumeric():
     print(number_string+' is not a number.')
@@ -285,6 +348,29 @@ def make_example(paths):
   return out_string[:-1]
 
 # Returns: value, exception_value
+def select_data_dataset_indices_and_reason(data_tag_meta, data_datasets, paths):
+  selected_dataset_indices, exception_value = select_multiple_numbers('[Example] '+make_example(paths)+'\nSelect datasets by index or (q)uit or (s)kip or (p)rint: ', 0, len(paths)-1)
+  if selected_dataset_indices == None: 
+    if exception_value == 'p':
+      keys_string = raw_input('Type in keys for datasets to print: ')
+      keys = keys_string.split(',')
+      #search_string = datasets.get_mc_dataset_search_string_keys(mc_tag_meta, keys)
+      print_data_datasets_simple(data_datasets, keys)
+      return select_data_dataset_indices_and_reason(data_tag_meta, data_datasets, paths)
+    else: return None, exception_value
+  reason = raw_input('Type in a reason of selection:\n')
+  print('')
+  for selected_dataset_index in selected_dataset_indices:
+    print('Selected ['+str(selected_dataset_index)+'] : '+paths[selected_dataset_index]+'.')
+  print('Reason:')
+  print(reason)
+  print('')
+  yn = select_yn()
+  if yn == 'n':
+    return select_data_dataset_indices_and_reason(data_tag_meta, data_datasets, paths)
+  return [selected_dataset_indices, reason], None
+
+# Returns: value, exception_value
 def select_dataset_indices_and_reason(mc_tag_meta, mc_datasets, paths):
   selected_dataset_indices, exception_value = select_multiple_numbers('[Example] '+make_example(paths)+'\nSelect datasets by index or (q)uit or (s)kip or (p)rint: ', 0, len(paths)-1)
   if selected_dataset_indices == None: 
@@ -308,7 +394,7 @@ def select_dataset_indices_and_reason(mc_tag_meta, mc_datasets, paths):
   return [selected_dataset_indices, reason], None
 
 # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
-def get_multiple_selection(multiple_mc_datasets, data_tiers):
+def get_multiple_selection(multiple_mc_datasets, data_tiers, mc_tag_meta):
   multiple_selection = {}
   for data_tier in data_tiers:
     for mc_dataset_name in multiple_mc_datasets:
@@ -321,6 +407,23 @@ def get_multiple_selection(multiple_mc_datasets, data_tiers):
           else:
             print('[Error] There are multiple '+mc_dataset_search_string+' in multiple_selection.')
           multiple_selection[mc_dataset_search_string]['paths'] = paths
+  return multiple_selection
+
+# multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
+def get_multiple_selection_data(multiple_data_datasets, data_tiers, data_tag_meta):
+  multiple_selection = {}
+  for data_tier in data_tiers:
+    for stream in multiple_data_datasets:
+      for year in multiple_data_datasets[stream]:
+        for run_group in multiple_data_datasets[stream][year]:
+          if data_tier in multiple_data_datasets[stream][year][run_group]:
+            data_dataset_search_string = datasets.get_data_dataset_search_string(data_tag_meta, stream, year, run_group, data_tier)
+            paths = sorted(multiple_data_datasets[stream][year][run_group][data_tier].keys())
+            if data_dataset_search_string not in multiple_selection:
+              multiple_selection[data_dataset_search_string] = {}
+            else:
+              print('[Error] There are multiple '+data_dataset_search_string+' in multiple_selection.')
+            multiple_selection[data_dataset_search_string]['paths'] = paths
   return multiple_selection
 
 def get_common_name(names):
@@ -339,6 +442,45 @@ def has_same_parent(same_parent_paths, path):
     if path in same_parent_paths[same_parent]:
       return True
   return is_same_parent
+
+def get_data_info_path_string(path, path_to_keys_data_datasets, same_parent_paths_data, same_run_paths_data, data_datasets, mini_to_nanos_from_nanoaod_data, nano_to_mini_from_miniaod_data, prefix):
+  out_info_path = ''
+  keys = path_to_keys_data_datasets[path]
+  keys.append(path)
+  path_info = nested_dict.get_item_nested_dict(data_datasets, keys)
+  
+  # Print extra info
+  if has_same_parent(same_parent_paths_data, path):
+    out_info_path += prefix+'  Has same parent\n'
+  if path in same_run_paths_data:
+    out_info_path += prefix+'  Has same runs\n'
+  else:
+    out_info_path += prefix+'  Does not have same runs\n'
+  if 'miniaod' in keys:
+    if path in mini_to_nanos_from_nanoaod_data:
+      out_info_path += prefix+'  Matching nanoaod: '+get_list_string(mini_to_nanos_from_nanoaod_data[path])+'\n'
+    else:
+      out_info_path += prefix+'  No matching nanoaod.\n'
+  if 'nanoaod' in keys:
+    if path in nano_to_mini_from_miniaod_data:
+      out_info_path += prefix+'  Matching miniaod: '+nano_to_mini_from_miniaod_data[path]+'\n'
+    else:
+      out_info_path += prefix+'  No matching miniaod.\n'
+
+  out_info_path += prefix + '  creation_time: '+str(datasets.convert_timestamp(path_info['creation_time']))+'\n'
+  out_info_path += prefix + '  number_events: '+"{:,}".format(path_info['number_events'])+'\n'
+  out_info_path += prefix + '  parent_chain:\n'
+  parent_prefix = '    '
+  for parent in path_info['parent_chain']:
+    out_info_path += prefix + parent_prefix + parent +'\n'
+    parent_prefix += '  '
+  if len(path_info['children']) != 0:
+    out_info_path += prefix + '  children:\n'
+    for child in path_info['children']:
+      out_info_path += prefix + '    ' + child+'\n'
+  out_info_path += prefix + '  runs: '+', '.join(path_info['runs'])+'\n'
+  out_info_path = out_info_path.rstrip()
+  return out_info_path
 
 def get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, mc_datasets, mini_to_nanos_from_nanoaod, nano_to_mini_from_miniaod, prefix):
 
@@ -362,7 +504,7 @@ def get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, mc_d
     if path in nano_to_mini_from_miniaod:
       out_info_path += prefix+'  Matching miniaod: '+nano_to_mini_from_miniaod[path]+'\n'
     else:
-      out_info_path += prefix+'  No matching miniaod.'
+      out_info_path += prefix+'  No matching miniaod.\n'
 
   out_info_path += prefix + '  creation_time: '+str(datasets.convert_timestamp(path_info['creation_time']))+'\n'
   out_info_path += prefix + '  number_events: '+"{:,}".format(path_info['number_events'])+'\n'
@@ -377,6 +519,31 @@ def get_info_path_string(path, path_to_keys_mc_datasets, same_parent_paths, mc_d
       out_info_path += prefix + '    ' + child+'\n'
   out_info_path = out_info_path.rstrip()
   return out_info_path
+
+# multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
+def select_data_paths_from_multiple(data_tag_meta, data_datasets, multiple_selection):
+  data_datasets_selected = {}
+  data_datasets_non_selected = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        for data_tier in data_datasets[stream][year][run_group]:
+          search_string = datasets.get_data_dataset_search_string(data_tag_meta, stream, year, run_group, data_tier)
+          multiple_selected_paths = None
+          if search_string in multiple_selection:
+            multiple_selected_paths = multiple_selection[search_string]['selected_paths']
+          if len(data_datasets[stream][year][run_group][data_tier]) == 1: 
+            path = next(iter(data_datasets[stream][year][run_group][data_tier]))
+            nested_dict.fill_nested_dict(data_datasets_selected, [stream, year, run_group, data_tier, path], data_datasets[stream][year][run_group][data_tier][path])
+          else:
+            for path in data_datasets[stream][year][run_group][data_tier]:
+              if multiple_selected_paths != None:
+                if path in multiple_selected_paths:
+                  nested_dict.fill_nested_dict(data_datasets_selected, [stream, year, run_group, data_tier, path], data_datasets[stream][year][run_group][data_tier][path])
+              else:
+                print('[Warning] '+path+' is not in multiple_selection. Will not select any dataset.')
+                nested_dict.fill_nested_dict(data_datasets_non_selected, [stream, year, run_group, data_tier, path], data_datasets[stream][year][run_group][data_tier][path])
+  return data_datasets_selected, data_datasets_non_selected
 
 # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
 def select_paths_from_multiple(mc_tag_meta, mc_datasets, multiple_selection):
@@ -438,9 +605,11 @@ if __name__ == '__main__':
   mc_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'mc_datasets.json')
   data_datasets_filename = os.path.join(args['in_json_folder'],args['in_json_prefix']+'data_datasets.json')
 
+  multiple_selection_data_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'data_multiple_selection.json')
+  selected_data_datasets_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'data_datasets.json')
+
   multiple_selection_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'mc_multiple_selection.json')
   selected_mc_datasets_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'mc_datasets.json')
-  selected_data_datasets_filename = os.path.join(args['out_json_folder'], args['out_json_prefix']+'data_datasets.json')
 
   if make_mc_datasets:
     #data_tiers = ['miniaod']
@@ -458,6 +627,16 @@ if __name__ == '__main__':
   if make_data_datasets:
     # Ex) data_tag_meta[2016][B][MET][miniaod] = 17Jul2018
     data_tag_meta = datasets.parse_data_tag_meta(data_tag_meta_filename)
+    data_datasets = nested_dict.load_json_file(data_datasets_filename)
+
+    # Make meta data
+    path_to_keys_data_datasets = datasets.get_path_to_keys_data_datasets(data_datasets)
+    search_string_to_keys_data_datasets =  datasets.get_search_string_to_keys_data_datasets(data_tag_meta, data_datasets)
+    same_run_paths_data = datasets.get_same_run_paths_data(data_datasets)
+    same_parent_paths_data = datasets.get_same_parent_paths_data(data_datasets)
+    multiple_data_datasets = datasets.get_multiple_data_datasets(data_datasets)
+    mini_to_nanos_from_nanoaod_data = datasets.get_mini_to_nanos_from_nanoaod_data_datasets(data_datasets)
+    nano_to_mini_from_miniaod_data = datasets.get_nano_to_mini_from_miniaod_data_datasets(data_datasets)
 
   if make_mc_datasets:
     # mc_datasets[mc_dataset_name][year][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
@@ -473,19 +652,76 @@ if __name__ == '__main__':
     nano_to_mini_from_miniaod = datasets.get_nano_to_mini_from_miniaod_mc_datasets(mc_datasets)
 
   if make_data_datasets:
-    data_datasets = nested_dict.load_json_file(data_datasets_filename)
     datasets.check_false_none_data_datasets(data_datasets)
-    datasets.print_multiple_data_datasets(data_datasets)
-    nested_dict.save_json_file(data_datasets, selected_data_datasets_filename)
+
+    # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
+    # Load multiple_selections selected from file
+    multiple_selection_data_from_file = {}
+    if os.path.exists(multiple_selection_data_filename):
+      multiple_selection_data_from_file = nested_dict.load_json_file(multiple_selection_data_filename)
+    # Load multiple_selection possible from json
+    multiple_selection_data = get_multiple_selection_data(multiple_data_datasets, data_tiers, data_tag_meta)
+    # Show previous selections
+    print('--------')
+    print('Previous selections.')
+    print('')
+    for search_string in sorted(multiple_selection_data_from_file.keys()):
+      print_multiple_select_simple(multiple_selection_data_from_file, search_string)
+      print('')
+    print('--------')
+    # Show selection need to be made
+    for search_string in sorted(multiple_selection_data.keys()):
+      print('--------')
+      print(str(count_number_selections_left(multiple_selection_data, multiple_selection_data_from_file))+' selections left')
+
+      # Check if need to select
+      if need_to_select(multiple_selection_data, multiple_selection_data_from_file, search_string):
+        if search_string in multiple_selection_data_from_file:
+          print('[Before]')
+          print_multiple_select_simple(multiple_selection_data_from_file, search_string)
+          print('Paths are different with before. Please re-select.')
+          print('')
+      else:
+        print(search_string +' was already selected.\nSelected below paths.')
+        for selected_path in multiple_selection_data_from_file[search_string]['selected_paths']:
+          print('  '+selected_path)
+        print('')
+        continue
+      # Select
+      print_multiple_data_dataset_info(search_string, multiple_selection_data, search_string_to_keys_data_datasets, path_to_keys_data_datasets, same_parent_paths_data, same_run_paths_data, multiple_data_datasets, mini_to_nanos_from_nanoaod_data, nano_to_mini_from_miniaod_data)
+      paths = multiple_selection_data[search_string]['paths']
+      selected_result, exception_value = select_data_dataset_indices_and_reason(data_tag_meta, data_datasets, paths)
+      # Abort due to 'q' selection
+      if selected_result == None and exception_value=='q': break
+      # Skip due to 's' selection
+      if selected_result == None and exception_value=='s': continue
+      selected_dataset_indices = selected_result[0]
+      reason = selected_result[1]
+      update_selection(search_string, multiple_selection_data[search_string]['paths'], selected_dataset_indices, reason, multiple_selection_data_from_file)
+      nested_dict.save_json_file(multiple_selection_data_from_file, multiple_selection_data_filename)
+      print('Saved to '+multiple_selection_data_filename)
+      print('')
+
+    if multiple_selection_data_from_file != {}:
+      # Save final result to mc_datasets file
+      data_datasets_selected, data_datasets_non_selected = select_data_paths_from_multiple(data_tag_meta, data_datasets, multiple_selection_data_from_file)
+      # Do simple checks
+      datasets.print_same_run_data_datasets(data_datasets_selected)
+      # Save results
+      nested_dict.save_json_file(data_datasets_selected, selected_data_datasets_filename)
+    else:
+      # Save results
+      nested_dict.save_json_file(data_datasets, selected_data_datasets_filename)
+      pass
 
   if make_mc_datasets:
     # multiple_selection[search_string]= {'paths':[paths], 'selected_paths':[path_selection], 'reason':reason}
-    # Load multiple_selection from file
+    # Load multiple_selection selected from file
     multiple_selection_from_file = {}
     if os.path.exists(multiple_selection_filename):
       multiple_selection_from_file = nested_dict.load_json_file(multiple_selection_filename)
-    # Load multiple_selection from json
-    multiple_selection = get_multiple_selection(multiple_mc_datasets, data_tiers)
+    # Load multiple_selection possible from json
+    multiple_selection = get_multiple_selection(multiple_mc_datasets, data_tiers, mc_tag_meta)
 
     # Should do automatic selection for ext. 
     auto_select_extension(multiple_selection, multiple_selection_from_file, multiple_selection_filename)
@@ -499,6 +735,7 @@ if __name__ == '__main__':
       print('')
     print('--------')
 
+    # Show selection need to be made
     for search_string in sorted(multiple_selection.keys()):
       print('--------')
       print(str(count_number_selections_left(multiple_selection, multiple_selection_from_file))+' selections left')
@@ -544,8 +781,6 @@ if __name__ == '__main__':
       nested_dict.save_json_file(mc_datasets, selected_mc_datasets_filename)
       
     
-
-
 
   #datasets.print_same_parent_mc_datasets(mc_datasets)
   #datasets.print_multiple_mc_datasets(mc_datasets)

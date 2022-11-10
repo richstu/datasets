@@ -220,14 +220,18 @@ def get_keys_data_datasets(data_tag_meta, data_tiers):
 # mc_datasets_list = [ [ [mc_dataset_name, year, data_tier, path, path_info] ] ]
 def get_mc_datasets_list(keys_mc_datasets):
   #print(keys_mc_datasets)
-  pool = multiprocessing.Pool()
+  ncpu = multiprocessing.cpu_count()
+  if ncpu > 8: ncpu = 8
+  pool = multiprocessing.Pool(ncpu)
   mc_datasets_list = pool.map(get_item_mc_datasets_list, keys_mc_datasets)
   return mc_datasets_list
 
 # data_datasets_list = [ [ [stream, year, run_group, data_tier, path, path_info] ] ]
-# data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int}
+# data_dataset[stream][year][run_group][data_tier][path] = {"parent_chain":[], "children":[], "creation time":string, "size":int, "files":int, "events:"int, "runs": []}
 def get_data_datasets_list(keys_data_datasets):
-  pool = multiprocessing.Pool()
+  ncpu = multiprocessing.cpu_count()
+  if ncpu > 8: ncpu = 8
+  pool = multiprocessing.Pool(ncpu)
   data_datasets_list = pool.map(get_item_data_datasets_list, keys_data_datasets)
   return data_datasets_list
 
@@ -446,6 +450,20 @@ def get_path_to_keys_data_datasets(data_datasets):
 #              path_to_keys_data_datasets[path] = [stream, year, run_group, data_tier]
 #  return path_to_keys_data_datasets
 
+def get_search_string_to_keys_data_datasets(data_tag_meta, data_datasets):
+  search_string_to_keys_data_datasets = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        for data_tier in data_datasets[stream][year][run_group]:
+          search_string = get_data_dataset_search_string(data_tag_meta, stream, year, run_group, data_tier)
+          if search_string in search_string_to_keys_data_datasets:
+            print('[Error] There is already search_string '+search_string+' in search_string_to_keys_data_datasets.')
+            print('  search_string_to_keys_data_datasets['+search_string+']: '+search_string_to_keys_data_datasets[path])
+          else:
+            search_string_to_keys_data_datasets[search_string] = [stream, year, run_group, data_tier]
+  return search_string_to_keys_data_datasets
+
 def get_search_string_to_keys_mc_datasets(mc_tag_meta, mc_datasets):
   search_string_to_keys_mc_datasets = {}
   for mc_dataset_name in mc_datasets:
@@ -484,6 +502,75 @@ def check_false_none_data_datasets(data_datasets):
               print('[Error]: There is None and also an entry in data_dataset['+stream+']['+year+']['+run_group+']['+data_tier+']:'+str(data_datasets[stream][year][run_group][data_tier]))
               break
 
+# same_run_paths[path] = [same runs]
+def get_same_run_paths_data(data_datasets):
+  same_run_paths_data = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        for data_tier in data_datasets[stream][year][run_group]:
+          # Compare paths
+          combination_paths_list = map(dict, itertools.combinations(data_datasets[stream][year][run_group][data_tier].iteritems(), 2))
+          for combination_paths in combination_paths_list:
+            path_a = list(combination_paths.keys())[0]
+            path_info_a = data_datasets[stream][year][run_group][data_tier][path_a]
+            runs_a = set(path_info_a['runs'])
+            path_b = list(combination_paths.keys())[1]
+            path_info_b = data_datasets[stream][year][run_group][data_tier][path_b]
+            runs_b = set(path_info_b['runs'])
+            intersect = runs_a.intersection(runs_b)
+            if len(intersect) != 0:
+              same_run_paths_data[path_a] = list(intersect)
+              same_run_paths_data[path_b] = list(intersect)
+  return same_run_paths_data
+
+# same_parent_paths[same_parent] = set(paths)
+def get_same_parent_paths_data(data_datasets):
+  same_parent_paths_data = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        for data_tier in data_datasets[stream][year][run_group]:
+          # Compare paths
+          combination_paths_list = map(dict, itertools.combinations(data_datasets[stream][year][run_group][data_tier].iteritems(), 2))
+          for combination_paths in combination_paths_list:
+            path_a = list(combination_paths.keys())[0]
+            path_info_a = data_datasets[stream][year][run_group][data_tier][path_a]
+            path_b = list(combination_paths.keys())[1]
+            path_info_b = data_datasets[stream][year][run_group][data_tier][path_b]
+            for iparent, parent in enumerate(path_info_a['parent_chain']):
+              if iparent >= len(path_info_b['parent_chain']): continue
+              if parent == path_info_b['parent_chain'][iparent]:
+                if parent not in same_parent_paths_data:
+                  same_parent_paths_data[parent] = set()
+                same_parent_paths_data[parent].add(path_a)
+                same_parent_paths_data[parent].add(path_b)
+  return same_parent_paths_data
+
+def get_same_parent_data_datasets_string(data_datasets):
+  out_string = ''
+  same_parent_paths = get_same_parent_paths_data(data_datasets)
+  # Print
+  for parent in same_parent_paths:
+    out_string += 'Same parent: '+parent+'\n'
+    for path in same_parent_paths[parent]:
+        out_string += '  '+path+'\n'
+  return out_string
+
+def print_same_parent_data_datasets(data_datasets):
+  print(get_same_parent_data_datasets_string(data_datasets))
+
+def get_same_run_data_datasets_string(data_datasets):
+  out_string = ''
+  same_run_paths = get_same_run_paths_data(data_datasets)
+  # Print
+  for path in same_run_paths:
+    out_string += "Has same run: "+path+' runs: '+', '.join(same_run_paths[path])+'\n'
+  return out_string
+
+def print_same_run_data_datasets(data_datasets):
+  print(get_same_run_data_datasets_string(data_datasets))
+
 # same_parent_paths[same_parent] = set(paths)
 def get_same_parent_paths(mc_datasets):
   same_parent_paths = {}
@@ -519,6 +606,20 @@ def get_same_parent_mc_datasets_string(mc_datasets):
 def print_same_parent_mc_datasets(mc_datasets):
   print(get_same_parent_mc_datasets_string(mc_datasets))
 
+def get_mini_to_nanos_from_nanoaod_data_datasets(data_datasets):
+  mini_to_nanos_from_nanoaod_data = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        if 'nanoaod' in data_datasets[stream][year][run_group]:
+          for path in data_datasets[stream][year][run_group]['nanoaod']:
+            path_info = data_datasets[stream][year][run_group]['nanoaod'][path]
+            parent = path_info['parent_chain'][0]
+            if parent not in mini_to_nanos_from_nanoaod_data:
+              mini_to_nanos_from_nanoaod_data[parent] = []
+            mini_to_nanos_from_nanoaod_data[parent].append(path)
+  return mini_to_nanos_from_nanoaod_data
+
 def get_mini_to_nanos_from_nanoaod_mc_datasets(mc_datasets):
   mini_to_nanos_from_nanoaod = {}
   for mc_dataset_name in mc_datasets:
@@ -531,6 +632,21 @@ def get_mini_to_nanos_from_nanoaod_mc_datasets(mc_datasets):
             mini_to_nanos_from_nanoaod[parent] = []
           mini_to_nanos_from_nanoaod[parent].append(path)
   return mini_to_nanos_from_nanoaod
+
+def get_nano_to_mini_from_miniaod_data_datasets(data_datasets):
+  nano_to_mini_from_miniaod_data = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        if 'miniaod' in data_datasets[stream][year][run_group]:
+          for path in data_datasets[stream][year][run_group]['miniaod']:
+            path_info = data_datasets[stream][year][run_group]['miniaod'][path]
+            for child in path_info['children']:
+              if child in nano_to_mini_from_miniaod_data:
+                print('[Error] : child: '+child+' was already filled.')
+                print('  nano_to_mini_from_miniaod_data: '+nano_to_mini_from_miniaod_data[child])
+              nano_to_mini_from_miniaod_data[child] = path
+  return nano_to_mini_from_miniaod_data
 
 def get_nano_to_mini_from_miniaod_mc_datasets(mc_datasets):
   nano_to_mini_from_miniaod = {}
@@ -953,6 +1069,18 @@ def get_multiple_mc_datasets(mc_datasets):
             path_info = mc_datasets[mc_dataset_name][year][data_tier][path]
             nested_dict.fill_nested_dict(multiple_mc_datasets, [mc_dataset_name, year, data_tier, path], path_info)
   return multiple_mc_datasets
+
+def get_multiple_data_datasets(data_datasets):
+  multiple_data_datasets = {}
+  for stream in data_datasets:
+    for year in data_datasets[stream]:
+      for run_group in data_datasets[stream][year]:
+        for data_tier in data_datasets[stream][year][run_group]:
+          if len(data_datasets[stream][year][run_group][data_tier]) > 1:
+            for path in data_datasets[stream][year][run_group][data_tier]:
+              path_info = data_datasets[stream][year][run_group][data_tier][path]
+              nested_dict.fill_nested_dict(multiple_data_datasets, [stream, year, run_group, data_tier, path], path_info)
+  return multiple_data_datasets
 
 def get_path_to_keys_dataset_files_info(dataset_files_info):
   path_to_keys_dataset_files_info = {}

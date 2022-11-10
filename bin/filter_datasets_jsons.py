@@ -374,6 +374,7 @@ if __name__ == '__main__':
 
     filtered_data_datasets = filter_data_datasets(data_datasets, reject_string_ignore_case_path_parent_data_datasets, 'pilot')
     #datasets.print_path_data_datasets(filtered_data_datasets)
-    check_common_runs_data_datasets(filtered_data_datasets)
+    #check_common_runs_data_datasets(filtered_data_datasets)
+    #datasets.print_multiple_data_datasets(data_datasets)
 
     nested_dict.save_json_file(filtered_data_datasets, out_filtered_data_datasets_filename)
