@@ -56,7 +56,9 @@ def run_command(argument):
 #key_results = [[key, commands]]
 def run_list_command(commands):
   # Multi
-  pool = multiprocessing.Pool()
+  ncpu = multiprocessing.cpu_count()
+  if ncpu > 8: ncpu = 8
+  pool = multiprocessing.Pool(ncpu)
   key_results = pool.map(run_command, commands)
   ## Single
   #key_results = []
