@@ -21,7 +21,7 @@ def make_data_database_tables(cursor):
   #cursor.execute('SELECT * FROM data_tags')
   cursor.execute('CREATE TABLE data_children(child_path text PRIMARY KEY, path text NOT NULL);')
   #cursor.execute('SELECT * FROM data_children')
-  cursor.execute('CREATE TABLE data_parent(parent_path text PRIMARY KEY, path text NOT NULL);')
+  cursor.execute('CREATE TABLE data_parent(parent_path text, path text NOT NULL);')
   #cursor.execute('SELECT * FROM data_parent')
   #print([description[0] for description in cursor.description])
 

@@ -46,9 +46,16 @@ def make_dataset_file_commands(list_dataset):
   return dataset_file_commands
 
 def run_command(argument):
-  print('command: '+argument[1])
   key = argument[0]
-  result = subprocess.check_output(argument[1], shell=True)
+  for iRetry in range(5):
+    try:
+      print('command: '+argument[1])
+      result = subprocess.check_output(argument[1], shell=True)
+      break
+    except subprocess.CalledProcessError as e:
+      print(e.output)
+      print('Trying again '+str(iRetry+1)+' command: '+argument[1])
+      time.sleep(3)
   print('result: '+result)
   return [key, result]
 
