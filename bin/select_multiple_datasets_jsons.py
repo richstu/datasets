@@ -61,6 +61,12 @@ def are_arguments_valid(args):
       return False, t_path+' does not exists.'
 
   if 'data' in args['mc_data']:
+    t_path = os.path.join(args['out_json_folder'], args['out_json_prefix']+'data_multiple_selection.json')
+    if os.path.isfile(t_path):
+      overwrite = ask.ask_key(t_path+' already exists. Do you want to overwrite? (y/n) Default is n. ', ['y','n'], 'n')
+      if overwrite == 'n':
+        return False, t_path+' already exists.'
+
     t_path = os.path.join(args['in_json_folder'], args['in_json_prefix']+'data_datasets.json')
     if not os.path.isfile(t_path):
       return False, t_path+' does not exists.'

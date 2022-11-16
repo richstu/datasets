@@ -41,11 +41,11 @@ def check_entries(job_argument_string):
     print(args)
     print(args_command)
     file_path = get_file_path(args_command['output_path'], "", args_command['input_path'])
-    #print(file_path)
     if not os.path.isfile(file_path): 
       # Wait for file to appear on raid
       file_exists = False
       for iWait in range(10):
+        print('iWait: '+str(iWait)+'/10 Waiting 10 seconds for file to appear')
         time.sleep(10)
         if os.path.isfile(file_path):
           file_exists = True
