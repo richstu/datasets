@@ -277,6 +277,8 @@ if __name__ == '__main__':
   mc_dataset_2016APV_names_filename = meta_folder+'/mc_dataset_2016APV_names'
   mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
   mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
+  mc_dataset_2022_names_filename = meta_folder+'/mc_dataset_2022_names'
+  mc_dataset_2022EE_names_filename = meta_folder+'/mc_dataset_2022EE_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
   data_tag_meta_filename = meta_folder+'/data_tag_meta'
 
@@ -296,6 +298,8 @@ if __name__ == '__main__':
       [mc_dataset_2016APV_names_filename, ['2016APV']],
       [mc_dataset_2017_names_filename, ['2017']],
       [mc_dataset_2018_names_filename, ['2018']],
+      [mc_dataset_2022_names_filename, ['2022']],
+      [mc_dataset_2022EE_names_filename, ['2022EE']],
       ])
     #print ('dataset_names:', mc_dataset_names)
     # Ex) tag_meta[2016] = RunIISummer16, MiniAODv3, NanoAODv5

@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Makes disk_files.jsons.')
   parser.add_argument('-t', '--mc_data', metavar='"mc,data"', nargs=1, default=['mc,data'])
-  parser.add_argument('-b', '--base_folder', metavar='/net/cms17/cms17r0/pico', nargs=1, default=['/net/cms17/cms17r0/pico'])
+  parser.add_argument('-b', '--base_folder', metavar='/net/cms11/cms11r0/pico', nargs=1, default=['/net/cms11/cms11r0/pico'])
   parser.add_argument('-o', '--out_jsons_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-n', '--nanoaod_version', metavar='NanoAODv9', nargs=1, default=['NanoAODv9'])
   parser.add_argument('-op', '--out_jsons_prefix', metavar="''", nargs=1, default=[''])

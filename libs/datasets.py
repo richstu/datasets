@@ -18,6 +18,7 @@ import datetime
 import itertools
 import nested_dict
 import time
+import re
 
 ## mc_dataset_names = [mc_dataset]
 ## Ex) mc_dataset_names[0] = TTJets_SingleLeptFromT_Tune
@@ -143,7 +144,11 @@ def get_mc_dataset_search_string_keys(mc_tag_meta, keys):
 def get_data_dataset_search_string(data_tag_meta, stream, year, run_group, data_tier):
   if not nested_dict.is_nested_dict(data_tag_meta, [year, run_group, stream, data_tier]): return '/'+stream+'/Run'+str(year)+run_group+'*unknown_tag_for_'+str(year)+'*/'+get_data_tier_tag(data_tier,True)
   reco_tag = data_tag_meta[year][run_group][stream][data_tier]
-  data_dataset_path = '/'+stream+'/Run'+str(year)+run_group+'*'+reco_tag+'*/'+get_data_tier_tag(data_tier,True)
+  year_number = re.findall('\d+', year)[0]
+  if year == "2016":  # To prevent overlap with 2016APV
+    data_dataset_path = '/'+stream+'/Run'+str(year_number)+run_group+'*-'+reco_tag+'*/'+get_data_tier_tag(data_tier,True)
+  else:
+    data_dataset_path = '/'+stream+'/Run'+str(year_number)+run_group+'*'+reco_tag+'*/'+get_data_tier_tag(data_tier,True)
   return data_dataset_path
 
 def get_data_dataset_search_string_keys(data_tag_meta, keys):
@@ -153,6 +158,7 @@ def query_dataset(query_type, dataset_path, verbose=True):
   for iRetry in range(5):
     try:
       if verbose: print('Query: '+query_type+' Dataset: '+dataset_path)
+      #if verbose: print('dasgoclient -query="'+query_type+' dataset='+dataset_path+'"')
       result = subprocess.check_output('dasgoclient -query="'+query_type+' dataset='+dataset_path+'"', shell=True, universal_newlines=True).split()
       break
     except subprocess.CalledProcessError as e:

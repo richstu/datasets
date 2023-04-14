@@ -601,10 +601,10 @@ if __name__ == '__main__':
   meta_folder = args['meta_folder']
   data_tiers = args['data_tiers']
 
-  mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
-  mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
-  mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
-  mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
+  #mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
+  #mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
+  #mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
+  #mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
   data_tag_meta_filename = meta_folder+'/data_tag_meta'
 
