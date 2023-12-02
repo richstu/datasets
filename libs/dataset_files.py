@@ -3,6 +3,7 @@ import multiprocessing
 import subprocess
 import json
 import datasets
+import time
 
 #datasets_files_info[dataset][filename] = {'number_events':number_events, 'file_size': file_size, 'check_sum': check_sum, 'modification_date': modification_date}
 #dataset_meta_results = [[dataset, filename], results]]
@@ -47,7 +48,7 @@ def make_dataset_file_commands(list_dataset):
 
 def run_command(argument):
   key = argument[0]
-  for iRetry in range(5):
+  for iRetry in range(10):
     try:
       print('command: '+argument[1])
       result = subprocess.check_output(argument[1], shell=True)

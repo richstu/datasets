@@ -56,6 +56,7 @@ def make_dataset_files_jsons(path_datasets_filename, out_dataset_files_info_file
   dataset_file_results = dataset_files.run_list_command(dataset_file_commands)
   #datasets_files_info[dataset][filename] = {'number_events':number_events}
   dataset_files_info = dataset_files.parse_dataset_file_results(dataset_file_results)
+  nested_dict.save_json_file(dataset_files_info, out_dataset_files_info_filename) # intermediate save for debugging
 
   # Get meta for each file
   dataset_meta_commands = dataset_files.make_dataset_meta_commands(dataset_files_info)
