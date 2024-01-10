@@ -22,7 +22,7 @@ def are_arguments_valid(args):
     return False, 'data_tier: '+str(args['data_tiers'])+' is not valid.'
 
   # Check for years
-  if not argparse_helper.is_valid(args, 'years', ['2016', '2016APV', '2017', '2018', '2022', '2022EE', '2023']):
+  if not argparse_helper.is_valid(args, 'years', ['2016', '2016APV', '2017', '2018', '2022', '2022EE', '2023', '2023BPix']):
     return False, 'years: '+str(args['years'])+' is not valid.'
   
   # Will not check for mc_data_sig. Can't know what nanoaod_tag will be.
@@ -261,7 +261,7 @@ if __name__ == '__main__':
   parser.add_argument('-m', '--meta_folder', metavar='./meta', nargs=1, default=['./meta'])
   parser.add_argument('-d', '--data_tiers', metavar='"nanoaod"', nargs=1, default=['nanoaod'])
   parser.add_argument('-t', '--mc_data_sig', metavar='""', nargs=1, default=[''])
-  parser.add_argument('-y', '--years', metavar='"2016,2016APV,2017,2018,2022,2022EE,2023"', nargs=1, default=['2016,2016APV,2017,2018,2022,2022EE,2023'])
+  parser.add_argument('-y', '--years', metavar='"2016,2016APV,2017,2018,2022,2022EE,2023,2023BPix"', nargs=1, default=['2016,2016APV,2017,2018,2022,2022EE,2023,2023BPix'])
   parser.add_argument('-i', '--in_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-ip', '--in_json_prefix', metavar='selected_', nargs=1, default=['selected_'])
   #parser.add_argument('-is', '--in_mc_multiple_selection_json', metavar='mc_multiple_selection.json', nargs=1, default=['mc_multiple_selection.json'])
@@ -290,6 +290,7 @@ if __name__ == '__main__':
   mc_dataset_2022_names_filename = meta_folder+'/mc_dataset_2022_names'
   mc_dataset_2022EE_names_filename = meta_folder+'/mc_dataset_2022EE_names'
   mc_dataset_2023_names_filename = meta_folder+'/mc_dataset_2023_names'
+  mc_dataset_2023BPix_names_filename = meta_folder+'/mc_dataset_2023BPix_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
   data_tag_meta_filename = meta_folder+'/data_tag_meta'
 
@@ -326,6 +327,7 @@ if __name__ == '__main__':
       [mc_dataset_2022_names_filename, ['2022']],
       [mc_dataset_2022EE_names_filename, ['2022EE']],
       [mc_dataset_2023_names_filename, ['2023']],
+      [mc_dataset_2023BPix_names_filename, ['2023BPix']],
       ])
     #print ('dataset_names:', mc_dataset_names)
     # Ex) tag_meta[2016] = RunIISummer16, MiniAODv3, NanoAODv5
