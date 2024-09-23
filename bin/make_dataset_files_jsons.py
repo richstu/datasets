@@ -53,14 +53,18 @@ def make_dataset_files_jsons(path_datasets_filename, out_dataset_files_info_file
   # Get files for each dataset
   dataset_file_commands = dataset_files.make_dataset_file_commands(list_dataset)
   #dataset_file_commands = [[dataset, commands]]
-  dataset_file_results = dataset_files.run_list_command(dataset_file_commands)
+  dataset_file_results = dataset_files.run_list_command(dataset_file_commands, ['error'])
   #datasets_files_info[dataset][filename] = {'number_events':number_events}
   dataset_files_info = dataset_files.parse_dataset_file_results(dataset_file_results)
   nested_dict.save_json_file(dataset_files_info, out_dataset_files_info_filename) # intermediate save for debugging
 
+  ## Load saved json
+  #print(out_dataset_files_info_filename)
+  #dataset_files_info = nested_dict.load_json_file(out_dataset_files_info_filename)
+
   # Get meta for each file
   dataset_meta_commands = dataset_files.make_dataset_meta_commands(dataset_files_info)
-  dataset_meta_results = dataset_files.run_list_command(dataset_meta_commands)
+  dataset_meta_results = dataset_files.run_list_command(dataset_meta_commands, ['error', 'query'])
   dataset_files.parse_dataset_meta_results(dataset_meta_results, dataset_files_info)
   nested_dict.save_json_file(dataset_files_info, out_dataset_files_info_filename)
 

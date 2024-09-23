@@ -106,8 +106,6 @@ if __name__ == "__main__":
       print('[For queue_system] to_submit: No servers have read access to the file')
     elif '[3010] Unable to open' in job_log_string:
       print('[For queue_system] to_submit: Unable to open')
-    elif '[3011] No servers are available to read the file' in job_log_string:
-      print('[For queue_system] to_submit: No servers are available')
     elif '[3010] XrdXrootdAio: Unable to read' in job_log_string:
       print('[For queue_system] to_submit: [301] Unable to read')
     elif '[FATAL] Connection error' in job_log_string:
@@ -116,6 +114,8 @@ if __name__ == "__main__":
       print('[For queue_system] to_submit: [3006] tried hosts option not supported')
     elif '[3007] Input/output error' in job_log_string:
       print('[For queue_system] to_submit: [3007] Input/output error')
+    elif '[3014] No servers are reachable' in job_log_string:
+      print('[For queue_system] to_submit: [3014] No servers are reachable')
     elif '[3006] File exists' in job_log_string:
       print(check_entries(job_argument_string))
     else:

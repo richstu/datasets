@@ -23,21 +23,18 @@ def are_arguments_valid(args):
   if not os.path.isdir(args['meta_folder']):
     return False, 'meta_folder: '+args['meta_folder']+" doesn't exist."
 
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_common_names')
-  if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_common: '+t_path+" doesn't exist."
+  for era in eras:
+    t_path = os.path.join(args['meta_folder'],'mc_dataset_'+era+'_names')
+    if not os.path.isfile(os.path.join(t_path)):
+      return False, 'meta_mc_dataset_'+era+'_names: '+t_path+" doesn't exist."
 
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_2016_names')
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_run2common_names')
   if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_2016_names: '+t_path+" doesn't exist."
+    return False, 'meta_mc_run2dataset_common: '+t_path+" doesn't exist."
 
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_2017_names')
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_run3common_names')
   if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_2017_names: '+t_path+" doesn't exist."
-
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_2018_names')
-  if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_2018_names: '+t_path+" doesn't exist."
+    return False, 'meta_mc_run3dataset_common: '+t_path+" doesn't exist."
 
   if 'data' not in args['mc_data_sig']:
     t_path = os.path.join(args['meta_folder'],'mc_tag_meta')
@@ -375,6 +372,8 @@ if __name__ == '__main__':
   parser.add_argument('-ik', '--in_disk_prefix', metavar="''", nargs=1, default=[''])
   parser.add_argument('-s', '--sql_search', metavar="''", nargs=1, default=[''])
 
+  eras = ['2016', '2016APV', '2017', '2018', '2022', '2022EE', '2023', '2023BPix']
+
   args = vars(parser.parse_args())
   argparse_helper.initialize_arguments(args, list_args=['mc_data_sig'])
   valid, log = are_arguments_valid(args)
@@ -387,13 +386,6 @@ if __name__ == '__main__':
   data_tiers = ['nanoaod']
 
   meta_folder = args['meta_folder']
-  mc_dataset_common_names_filename = meta_folder+'/mc_dataset_common_names'
-  mc_dataset_2016_names_filename = meta_folder+'/mc_dataset_2016_names'
-  mc_dataset_2016APV_names_filename = meta_folder+'/mc_dataset_2016APV_names'
-  mc_dataset_2017_names_filename = meta_folder+'/mc_dataset_2017_names'
-  mc_dataset_2018_names_filename = meta_folder+'/mc_dataset_2018_names'
-  mc_dataset_2022_names_filename = meta_folder+'/mc_dataset_2022_names'
-  mc_dataset_2022EE_names_filename = meta_folder+'/mc_dataset_2022EE_names'
   mc_tag_meta_filename = meta_folder+'/mc_tag_meta'
   data_tag_meta_filename = meta_folder+'/data_tag_meta'
 
@@ -434,16 +426,15 @@ if __name__ == '__main__':
     # datasets_files_info[dataset][filename] = {'number_events':int, 'check_sum':int, 'modification_date':int, 'file_size':int}
     mc_dataset_files_info = nested_dict.load_json_file(mc_dataset_files_info_filename)
 
-    # mc_dataset_names[year] = [(mc_dataset_name, mc_dir)]
-    mc_dataset_names = datasets.parse_multiple_mc_dataset_names([
-      [mc_dataset_common_names_filename, ['2016', '2016APV', '2017', '2018']],
-      [mc_dataset_2016_names_filename, ['2016']],
-      [mc_dataset_2016APV_names_filename, ['2016APV']],
-      [mc_dataset_2017_names_filename, ['2017']],
-      [mc_dataset_2018_names_filename, ['2018']],
-      [mc_dataset_2022_names_filename, ['2022']],
-      [mc_dataset_2022EE_names_filename, ['2022EE']],
-      ])
+    datasets_era = [
+      [meta_folder+'/mc_dataset_run2common_names', ['2016', '2016APV', '2017', '2018']],
+      [meta_folder+'/mc_dataset_run3common_names', ['2022', '2022EE', '2023', '2023BPix']],
+      ]
+    for era in eras:
+      datasets_era.append([meta_folder+'/mc_dataset_'+era+'_names', [era]])
+    # mc_dataset_names[year] = [(mc_dataset_name, path)]
+    mc_dataset_names = datasets.parse_multiple_mc_dataset_names(datasets_era)
+
     #print ('dataset_names:', mc_dataset_names)
     # Ex) tag_meta[2016] = RunIISummer16, MiniAODv3, NanoAODv5
     mc_tag_meta = datasets.parse_mc_tag_meta(mc_tag_meta_filename)

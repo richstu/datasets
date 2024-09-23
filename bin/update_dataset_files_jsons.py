@@ -93,13 +93,13 @@ def update_datasets_files_json(path_datasets_filename, in_dataset_files_info_fil
   # Get files for each dataset
   append_dataset_file_commands = dataset_files.make_dataset_file_commands(append_list_dataset)
   #dataset_file_commands = [[dataset, commands]]
-  append_dataset_file_results = dataset_files.run_list_command(append_dataset_file_commands)
+  append_dataset_file_results = dataset_files.run_list_command(append_dataset_file_commands, ['error'])
   #datasets_files_info[dataset][filename] = {'number_events':number_events}
   append_dataset_files_info = dataset_files.parse_dataset_file_results(append_dataset_file_results)
 
   # Get meta for each file
   append_dataset_meta_commands = dataset_files.make_dataset_meta_commands(append_dataset_files_info)
-  append_dataset_meta_results = dataset_files.run_list_command(append_dataset_meta_commands)
+  append_dataset_meta_results = dataset_files.run_list_command(append_dataset_meta_commands, ['error', 'query'])
   dataset_files.parse_dataset_meta_results(append_dataset_meta_results, append_dataset_files_info)
 
   remove_dataset_files_info(in_dataset_files_info, remove_list_dataset)

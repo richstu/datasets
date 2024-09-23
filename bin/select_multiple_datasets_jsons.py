@@ -11,7 +11,7 @@ import sys
 import argparse_helper
 import ask
 
-def are_arguments_valid(args):
+def are_arguments_valid(args, eras):
   # Check for data_tiers
   if not argparse_helper.is_valid(args, 'data_tiers', ['nanoaod', 'miniaod']):
     return False, 'data_tier: '+str(args['data_tiers'])+' is not valid.'
@@ -24,21 +24,18 @@ def are_arguments_valid(args):
   if not os.path.isdir(args['meta_folder']):
     return False, 'meta_folder: '+args['meta_folder']+" doesn't exist."
 
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_common_names')
-  if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_common: '+t_path+" doesn't exist."
+  for era in eras:
+    t_path = os.path.join(args['meta_folder'],'mc_dataset_'+era+'_names')
+    if not os.path.isfile(os.path.join(t_path)):
+      return False, 'meta_mc_dataset_'+era+'_names: '+t_path+" doesn't exist."
 
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_2016_names')
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_run2common_names')
   if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_2016_names: '+t_path+" doesn't exist."
+    return False, 'meta_mc_run2dataset_common: '+t_path+" doesn't exist."
 
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_2017_names')
+  t_path = os.path.join(args['meta_folder'],'mc_dataset_run3common_names')
   if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_2017_names: '+t_path+" doesn't exist."
-
-  t_path = os.path.join(args['meta_folder'],'mc_dataset_2018_names')
-  if not os.path.isfile(os.path.join(t_path)):
-    return False, 'meta_mc_dataset_2018_names: '+t_path+" doesn't exist."
+    return False, 'meta_mc_run3dataset_common: '+t_path+" doesn't exist."
 
   if 'mc' in args['mc_data']:
     t_path = os.path.join(args['meta_folder'],'mc_tag_meta')
@@ -586,9 +583,11 @@ if __name__ == '__main__':
   parser.add_argument('-o', '--out_json_folder', metavar='./jsons', nargs=1, default=['./jsons'])
   parser.add_argument('-op', '--out_json_prefix', metavar='selected_', nargs=1, default=['selected_'])
 
+  eras = ['2016', '2016APV', '2017', '2018', '2022', '2022EE', '2023', '2023BPix']
+
   args = vars(parser.parse_args())
   argparse_helper.initialize_arguments(args, list_args=['data_tiers','mc_data'])
-  valid, log = are_arguments_valid(args)
+  valid, log = are_arguments_valid(args, eras=eras)
   if not valid:
     print('[Error] '+log)
     sys.exit()
